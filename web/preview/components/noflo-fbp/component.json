@@ -1,0 +1,10 @@
+{
+  "name": "fbp",
+  "description": "Parser for the .fbp flow definition language",
+  "version": "1.0.0",
+  "scripts": [
+    "lib/fbp.js"
+  ],
+  "main": "lib/fbp.js",
+  "repo": "https://raw.github.com/noflo/fbp"
+}

@@ -1,0 +1,162 @@
+{
+  "properties": {
+    "environment": {
+      "runtime": "html",
+      "src": "./preview/iframe.html",
+      "width": "300",
+      "height": "300",
+      "content": ""
+    },
+    "name": "DetectPinch"
+  },
+  "exports": [
+    {
+      "private": "core/split_ewbre.in",
+      "public": "in"
+    },
+    {
+      "private": "sendpass_cf0pu.out",
+      "public": "pass"
+    },
+    {
+      "private": "sendfail_vmi5n.out",
+      "public": "fail"
+    }
+  ],
+  "processes": {
+    "core/Split_ewbre": {
+      "component": "core/Split",
+      "metadata": {
+        "x": 740,
+        "y": 151,
+        "label": "core/Split"
+      }
+    },
+    "SendFail_vmi5n": {
+      "component": "strings/SendString",
+      "metadata": {
+        "x": 1423,
+        "y": 259,
+        "label": "SendFail"
+      }
+    },
+    "SendPass_cf0pu": {
+      "component": "strings/SendString",
+      "metadata": {
+        "x": 1421,
+        "y": 65,
+        "label": "SendPass"
+      }
+    },
+    "objects/Size_jjmmg": {
+      "component": "objects/Size",
+      "metadata": {
+        "x": 939,
+        "y": 150,
+        "label": "objects/Size"
+      }
+    },
+    "math/Compare_hk3su": {
+      "component": "math/Compare",
+      "metadata": {
+        "x": 1146,
+        "y": 147,
+        "label": "math/Compare"
+      }
+    }
+  },
+  "connections": [
+    {
+      "src": {
+        "process": "objects/Size_jjmmg",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "math/Compare_hk3su",
+        "port": "value"
+      },
+      "metadata": {
+        "route": 9
+      }
+    },
+    {
+      "src": {
+        "process": "math/Compare_hk3su",
+        "port": "pass"
+      },
+      "tgt": {
+        "process": "SendPass_cf0pu",
+        "port": "in"
+      },
+      "metadata": {
+        "route": 5
+      }
+    },
+    {
+      "src": {
+        "process": "math/Compare_hk3su",
+        "port": "fail"
+      },
+      "tgt": {
+        "process": "SendFail_vmi5n",
+        "port": "in"
+      },
+      "metadata": {
+        "route": 1
+      }
+    },
+    {
+      "src": {
+        "process": "core/Split_ewbre",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "SendFail_vmi5n",
+        "port": "string"
+      },
+      "metadata": {
+        "route": 9
+      }
+    },
+    {
+      "src": {
+        "process": "core/Split_ewbre",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "SendPass_cf0pu",
+        "port": "string"
+      },
+      "metadata": {
+        "route": 9
+      }
+    },
+    {
+      "src": {
+        "process": "core/Split_ewbre",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "objects/Size_jjmmg",
+        "port": "in"
+      },
+      "metadata": {
+        "route": 9
+      }
+    },
+    {
+      "data": 1,
+      "tgt": {
+        "process": "math/Compare_hk3su",
+        "port": "comparison"
+      }
+    },
+    {
+      "data": ">",
+      "tgt": {
+        "process": "math/Compare_hk3su",
+        "port": "operator"
+      }
+    }
+  ]
+}

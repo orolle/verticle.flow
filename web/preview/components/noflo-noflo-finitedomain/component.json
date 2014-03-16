@@ -1,0 +1,31 @@
+{
+  "name": "noflo-finitedomain",
+  "description": "Finite Domain Constraint Solver",
+  "author": "Henri Bergius <henri.bergius@iki.fi>",
+  "repo": "noflo/noflo-finitedomain",
+  "version": "0.1.0",
+  "keywords": [],
+  "dependencies": {
+    "noflo/noflo": "*",
+    "bergie/FD.js": "*"
+  },
+  "scripts": [
+    "components/CreateSpace.coffee",
+    "components/DeclareVariable.coffee",
+    "components/GreaterThan.coffee",
+    "components/Solve.coffee",
+    "index.js"
+  ],
+  "json": [
+    "component.json"
+  ],
+  "noflo": {
+    "icon": "puzzle-piece",
+    "components": {
+      "CreateSpace": "components/CreateSpace.coffee",
+      "DeclareVariable": "components/DeclareVariable.coffee",
+      "GreaterThan": "components/GreaterThan.coffee",
+      "Solve": "components/Solve.coffee"
+    }
+  }
+}

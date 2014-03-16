@@ -1,0 +1,52 @@
+VertX does not support Websocket subprotocols (atm):
+components/noflo-noflo-runtime/src/runtimes/websocket.coffee
+Hack: Force NoFlo-UI not to use any sub protocol
+
+Change line 
+FROM
+    @connection = new WebSocket @getAddress(), @protocol
+TO
+    @connection = new WebSocket @getAddress() #, @protocol
+    
+    
+
+
+NoFlo-UI does not know FBP-Vertigo-Runtime:
+elements/noflo-main.html
+Hack: Add vertigo runtime in defaults
+
+IN FUNCTION  preparedefaults: function () { ... }
+
+Add after definition of "Local NoFlo HTML5 environment":
+        runtime = new this.registry.Runtime({
+          label: 'Vertigo runtime',
+          id: require('uuid')(),
+          protocol: 'websocket',
+          address: 'ws://localhost:3111/fbpnp',
+          type: 'noflo-vertigo'
+        });
+        this.userRuntimes.push(runtime.runtime);
+        
+        
+
+NoFlo-UI has a bug in detection & usage of runtimes:
+elements/noflo-runtime.html
+Hack: add noflo-vertigo runtime as option so that type can be set
+
+IN FUNCTION  updateGraphType: function (graph) { ... }
+
+REPLACE Switch-Case with:
+        switch (env.runtime) {
+          case 'noflo-vertigo':
+            type = 'noflo-vertigo';
+            break;
+          case 'websocket':
+            type = 'noflo-nodejs';
+            break;
+          default:
+            type = 'noflo-browser';
+            break;
+        }
+        
+
+If a project is created, select noflo-vertigo runtime. The first time in the project you have to select the noflo-vertigo runtime again (top-right corner)

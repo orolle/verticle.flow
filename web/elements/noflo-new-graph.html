@@ -1,0 +1,59 @@
+<link rel="import" href="noflo-type-selector.html">
+<polymer-element name="noflo-new-graph" attributes="project runtimes" class="modal-content">
+  <template>
+    <h1>Create new graph</h1>
+    <form>
+      <label>
+        Graph name
+        <input type="text" value="{{ name }}" placeholder="MyCoolGraph" required>
+      </label>
+      <label>
+        Type
+        <noflo-type-selector type="{{ type }}" runtimes="{{ runtimes }}"></noflo-type-selector>
+      </label>
+      <div class="toolbar">
+        <button on-click="{{ send }}">Create</button>
+        <a on-click="{{ close }}">Cancel</a>
+      </div>
+    </form>
+  </template>
+  <script>
+    Polymer('noflo-new-graph', {
+      name: '',
+      project: '',
+      runtimes: [],
+      type: 'noflo-browser',
+      enteredView: function () {
+        document.getElementById('container').classList.add('blur');
+      },
+      leftView: function () {
+        document.getElementById('container').classList.remove('blur');
+      },
+      send: function (event) {
+        if (event) {
+          event.preventDefault();
+        }
+        if (!this.name) {
+          return;
+        }
+        var noflo = require('noflo');
+        var graph = new noflo.Graph(this.name);
+        graph.setProperties({
+          id: graph.name.replace(' ', '_'),
+          project: this.project,
+          environment: {
+            type: this.type
+          }
+        });
+        this.fire('new', graph);
+        this.close();
+      },
+      close: function () {
+        if (!this.parentNode) {
+          return;
+        }
+        this.parentNode.removeChild(this);
+      }
+    });
+  </script>
+</polymer-element>

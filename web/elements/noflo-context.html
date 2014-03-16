@@ -1,0 +1,323 @@
+<link rel="import" href="noflo-node-inspector.html">
+<link rel="import" href="noflo-exported-inspector.html">
+<link rel="import" href="noflo-new-graph.html">
+<link rel="import" href="noflo-group-inspector.html">
+<link rel="import" href="../bower_components/the-card/the-card/the-card.html">
+<link rel="import" href="../bower_components/the-panel/the-panel/the-panel.html">
+<polymer-element name="noflo-context" attributes="project graphs component node edge search">
+  <template>
+    <section id="context"></section>
+    <the-panel id="fixed" edge="right" size="324" handle="36" automatic="false">
+      <header></header>
+      <main></main>
+      <footer></footer>
+    </the-panel>
+  </template>
+  <script>
+    Polymer('noflo-context', {
+      project: null,
+      db: null,
+      search: '',
+      editor: null,
+      graphs: [],
+      nodes: [],
+      edges: [],
+      runtimes: [],
+      component: '',
+      enteredView: function () {
+        this.contextBar = this.$.context;
+        window.addEventListener('keyup', function (e) {
+          if (e.keyCode === 27) {
+            this.clearSelection();
+          }
+        }.bind(this));
+      },
+      clearSelection: function () {
+        var edge, node;
+        // Clear selections on Esc
+        while (this.edges.length) {
+          edge = this.edges.pop();
+          edge.selected = false;
+        }
+        while (this.nodes.length) {
+          node = this.nodes.pop();
+          node.selected = false;
+        }
+      },
+      getpanel: function () {
+        this.fire('toolpanel', this.$.fixed);
+        this.fire('contextpanel', this.$.context);
+      },
+      editorChanged: function () {
+        if (!this.editor) {
+          return;
+        }
+        this.editor.addMenuAction('graphInport', 'n4', {
+          icon: 'pencil-square-o',
+          iconLabel: 'rename',
+          action: function (graph, itemKey, item) {
+            var dialog = document.createElement('noflo-exported-inspector');
+            dialog.graph = this.graphs[this.graphs.length - 1];
+            dialog.publicport = itemKey;
+            dialog.privateport = item;
+            dialog.direction = 'input';
+            document.body.appendChild(dialog);
+          }.bind(this)
+        });
+        this.editor.addMenuAction('graphOutport', 'n4', {
+          icon: 'pencil-square-o',
+          iconLabel: 'rename',
+          action: function (graph, itemKey, item) {
+            var dialog = document.createElement('noflo-exported-inspector');
+            dialog.graph = this.graphs[this.graphs.length - 1];
+            dialog.publicport = itemKey;
+            dialog.privateport = item;
+            dialog.direction = 'output';
+            document.body.appendChild(dialog);
+          }.bind(this)
+        });
+        this.editor.addMenuAction('selection', 'e4', {
+          icon: 'sitemap',
+          iconLabel: 'graph',
+          action: this.subgraph.bind(this)
+        });
+        this.editor.addMenuAction('selection', 'w4', {
+          icon: 'square-o',
+          iconLabel: 'group',
+          action: this.group.bind(this)
+        });
+        this.editor.addMenuCallback('node', function (defaultMenu, options) {
+          if (!options.item.component) {
+            return defaultMenu;
+          }
+          var componentParts = options.item.component.split('/');
+          if (componentParts.shift() !== this.project.id) {
+            return defaultMenu;
+          }
+          var i, menuKey;
+          var localMenu = {};
+          var openAction =  {
+            icon: 'arrow-circle-o-up',
+            iconLabel: 'open',
+            action: function (graph, itemKey, item) {
+              window.location.hash += '/' + encodeURIComponent(item.id);
+            }
+          };
+
+          for (i = 0; i < this.project.graphs.length; i++) {
+            if (this.project.graphs[i].properties.id === componentParts[0]) {
+              for (menuKey in defaultMenu) {
+                localMenu[menuKey] = defaultMenu[menuKey];
+              }
+              localMenu.n4 = openAction;
+              return localMenu;
+            }
+          }
+          for (i = 0; i < this.project.components.length; i++) {
+            if (this.project.components[i].name === componentParts[0]) {
+              for (menuKey in defaultMenu) {
+                localMenu[menuKey] = defaultMenu[menuKey];
+              }
+              localMenu.n4 = openAction;
+              return localMenu;
+            }
+          }
+          return defaultMenu;
+        }.bind(this));
+      },
+      projectChanged: function () {
+        this.fire('project', this.project);
+      },
+      graphsChanged: function () {
+        this.fire('graphs', this.graphs);
+        if (this.graphs.length) {
+          var graph = this.graphs[this.graphs.length - 1];
+          this.fire('currentgraph', graph);
+          if (!graph.properties.project) {
+            window.setTimeout(function () {
+              this.fire('example', graph);
+            }.bind(this), 1);
+          } else {
+            var noflo = require('noflo');
+            var IDBJournalStore = require('noflo-ui/src/JournalStore').IDBJournalStore;
+            if (!graph.journal) {
+              var store = new IDBJournalStore(graph, this.db);
+              store.init(function () {
+                graph.journal = new noflo.Journal(graph, undefined, store);
+              });
+            }
+          }
+        }
+        this.search = '';
+      },
+      nodesChanged: function () {
+        this.fire('nodes', this.nodes);
+        if (this.nodes.length) {
+          this.showNodeCards();
+        } else {
+          this.hideNodeCards();
+        }
+      },
+      nodeInspectors: {},
+      showNodeCards: function () {
+        this.nodes.forEach(function (node) {
+          var id = node.id;
+          if (this.nodeInspectors[id]) {
+            return;
+          }
+          var inspector = document.createElement('noflo-node-inspector');
+          inspector.node = node;
+          inspector.component = this.editor.getComponent(node.component);
+          inspector.graph = this.graphs[this.graphs.length - 1];
+          this.nodeInspectors[id] = document.createElement('the-card');
+          this.nodeInspectors[id].type = 'node-inspector';
+          this.nodeInspectors[id].appendChild(inspector);
+          this.nodeInspectors[id].addTo(this.contextBar);
+        }.bind(this));
+
+        var found;
+        Object.keys(this.nodeInspectors).forEach(function (id) {
+          found = false;
+          this.nodes.forEach(function (node) {
+            if (node.id === id) {
+              found = true;
+            }
+          });
+          if (!found) {
+            this.nodeInspectors[id].parentNode.removeChild(this.nodeInspectors[id]);
+            delete this.nodeInspectors[id];
+          }
+        }.bind(this));
+      },
+      hideNodeCards: function () {
+        for (var id in this.nodeInspectors) {
+          this.nodeInspectors[id].parentNode.removeChild(this.nodeInspectors[id]);
+          delete this.nodeInspectors[id];
+        }
+      },
+      edgesChanged: function () {
+        this.fire('edges', this.edges);
+      },
+      componentChanged: function () {
+        if (this.component && typeof this.component === 'object' && !this.component.id) {
+          this.component = null;
+        }
+        this.fire('component', this.component);
+      },
+      clear: function () {
+        this.project = null;
+        this.graphs.splice(0, this.graphs.length);
+        this.nodes.splice(0, this.nodes.length);
+        this.edges.splice(0, this.edges.length);
+      },
+      group: function (graph, itemKey, item) {
+        event.preventDefault();
+
+        // See if the nodes are already part of a group
+        var group = '';
+        var description = '';
+        var selectedNodes = item.nodes;
+        selectedNodes.sort();
+
+        graph.groups.forEach(function (grp) {
+          var grpNodes = JSON.parse(JSON.stringify(grp.nodes));
+          grpNodes.sort();
+          if (grpNodes.join(',') == selectedNodes.join(',')) {
+            group = grp.name;
+            description = grp.metadata.description;
+          }
+        });
+
+        var dialog = document.createElement('noflo-group-inspector');
+        dialog.group = group;
+        dialog.groupdescription = description;
+        dialog.nodes = selectedNodes;
+        dialog.graph = graph;
+        document.body.appendChild(dialog);
+      },
+      subgraph: function (currentGraph, itemKey, item) {
+        event.preventDefault();
+
+        // Ask user to name the new subgraph
+        var dialog = document.createElement('noflo-new-graph');
+        dialog.runtimes = this.runtimes;
+        dialog.type = currentGraph.properties.environment.type;
+        document.body.appendChild(dialog);
+        dialog.addEventListener('new', function (event) {
+          var graph = event.detail;
+          graph.startTransaction('newsubgraph');
+
+          graph.setProperties({
+            id: graph.name.replace(' ', '_'),
+            project: currentGraph.properties.project
+          });
+
+          // Copy nodes
+          item.nodes.forEach(function (id) {
+            var node = currentGraph.getNode(id);
+            graph.addNode(node.id, node.component, node.metadata);
+          });
+
+          // Copy edges between nodes
+          currentGraph.edges.forEach(function (edge) {
+            if (graph.getNode(edge.from.node) && graph.getNode(edge.to.node)) {
+              graph.addEdge(edge.from.node, edge.from.port, edge.to.node, edge.to.port, edge.metadata);
+            }
+          });
+
+          // Move IIPs to subgraph as well
+          currentGraph.initializers.forEach(function (iip) {
+            if (graph.getNode(iip.to.node)) {
+              graph.addInitial(iip.from.data, iip.to.node, iip.to.port, iip.metadata);
+            }
+          });
+
+          // Create subgraph node
+          var initialMetadata = currentGraph.getNode(item.nodes[0]).metadata;
+          currentGraph.startTransaction('subgraph');
+          currentGraph.addNode(graph.properties.id, currentGraph.properties.project + '/' + graph.properties.id, {
+            label: graph.name,
+            x: initialMetadata.x,
+            y: initialMetadata.y
+          });
+
+          var subgraphPort = function (node, port) {
+            var portName = node + '.' + port;
+            return portName.replace(/(.*)\/(.*)(_.*)\.(.*)/, '$2_$4').toLowerCase();
+          };
+
+          // Reconnect external edges to subgraph node
+          currentGraph.edges.forEach(function (edge) {
+            // Edge from outside the new subgraph to a subgraph port
+            if (!graph.getNode(edge.from.node) && graph.getNode(edge.to.node)) {
+              // Create exported inport
+              var inport = subgraphPort(edge.to.node, edge.to.port);
+              graph.addInport(inport, edge.to.node, edge.to.port);
+              currentGraph.addEdge(edge.from.node, edge.from.port, graph.properties.id, inport);
+            }
+            // Edge from subgraph port to the outside
+            if (graph.getNode(edge.from.node) && !graph.getNode(edge.to.node)) {
+              var outport = subgraphPort(edge.from.node, edge.from.port);
+              graph.addOutport(outport, edge.from.node, edge.from.port);
+              currentGraph.addEdge(graph.properties.id, outport, edge.to.node, edge.to.port);
+            }
+          });
+
+          // Remove the selected nodes
+          item.nodes.forEach(function (id) {
+            currentGraph.removeNode(id);
+          });
+
+          // Emit new subgraph so that it can be stored
+          graph.endTransaction('newsubgraph');
+          this.fire('newgraph', graph);
+
+          // End the transaction on the main graph
+          setTimeout(function () {
+            currentGraph.endTransaction('subgraph');
+          }, 5);
+        }.bind(this));
+      }
+    });
+  </script>
+</polymer-element>

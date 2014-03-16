@@ -1,0 +1,22 @@
+{
+  "name": "OpenJSCADorg",
+  "repo": "jonnor/OpenJSCADorg",
+  "description": "",
+  "version": "0.0.1",
+  "keywords": [],
+  "dependencies": {
+    "components/underscore": "*"
+  },
+  "development": {},
+  "license": "MIT",
+  "main": "openjscad.js",
+  "scripts": [
+    "openjscad.js",
+    "lightgl.js",
+    "csg.js"
+  ],
+  "styles": [
+    "openjscad.css",
+    "style.css"
+  ]
+}

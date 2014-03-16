@@ -1,0 +1,39 @@
+{
+  "name": "noflo-strings",
+  "description": "String Utilities for NoFlo",
+  "author": "Henri Bergius <henri.bergius@iki.fi>",
+  "repo": "noflo/noflo-strings",
+  "version": "0.0.1",
+  "keywords": [],
+  "dependencies": {
+    "noflo/noflo": "*",
+    "component/underscore": "*"
+  },
+  "scripts": [
+    "components/CompileString.coffee",
+    "components/Filter.coffee",
+    "components/SendString.coffee",
+    "components/SplitStr.coffee",
+    "components/StringTemplate.coffee",
+    "components/Replace.coffee",
+    "components/Jsonify.coffee",
+    "components/ParseJson.coffee",
+    "index.js"
+  ],
+  "json": [
+    "component.json"
+  ],
+  "noflo": {
+    "icon": "font",
+    "components": {
+      "CompileString": "components/CompileString.coffee",
+      "Filter": "components/Filter.coffee",
+      "SendString": "components/SendString.coffee",
+      "SplitStr": "components/SplitStr.coffee",
+      "StringTemplate": "components/StringTemplate.coffee",
+      "Replace": "components/Replace.coffee",
+      "Jsonify": "components/Jsonify.coffee",
+      "ParseJson": "components/ParseJson.coffee"
+    }
+  }
+}

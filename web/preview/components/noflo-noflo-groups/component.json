@@ -1,0 +1,57 @@
+{
+  "name": "noflo-groups",
+  "description": "Group Utilities for NoFlo",
+  "keywords": [
+    "noflo",
+    "groups",
+    "utilities"
+  ],
+  "author": "Kenneth Kan <kenhkan@gmail.com>",
+  "version": "0.1.0",
+  "repo": "kenhkan/groups",
+  "dependencies": {
+    "component/underscore": "*",
+    "noflo/noflo": "*"
+  },
+  "scripts": [
+    "components/ReadGroups.coffee",
+    "components/RemoveGroups.coffee",
+    "components/Regroup.coffee",
+    "components/Group.coffee",
+    "components/GroupZip.coffee",
+    "components/FilterByGroup.coffee",
+    "components/Objectify.coffee",
+    "components/ReadGroup.coffee",
+    "components/SendByGroup.coffee",
+    "components/CollectGroups.coffee",
+    "components/CollectObject.coffee",
+    "components/FirstGroup.coffee",
+    "components/MapGroup.coffee",
+    "components/MergeGroups.coffee",
+    "components/GroupByObjectKey.coffee",
+    "index.js"
+  ],
+  "json": [
+    "component.json"
+  ],
+  "noflo": {
+    "icon": "tags",
+    "components": {
+      "ReadGroups": "components/ReadGroups.coffee",
+      "RemoveGroups": "components/RemoveGroups.coffee",
+      "Regroup": "components/Regroup.coffee",
+      "Group": "components/Group.coffee",
+      "GroupZip": "components/GroupZip.coffee",
+      "FilterByGroup": "components/FilterByGroup.coffee",
+      "Objectify": "components/Objectify.coffee",
+      "ReadGroup": "components/ReadGroup.coffee",
+      "SendByGroup": "components/SendByGroup.coffee",
+      "CollectGroups": "components/CollectGroups.coffee",
+      "CollectObject": "components/CollectObject.coffee",
+      "FirstGroup": "components/FirstGroup.coffee",
+      "MapGroup": "components/MapGroup.coffee",
+      "MergeGroups": "components/MergeGroups.coffee",
+      "GroupByObjectKey": "components/GroupByObjectKey.coffee"
+    }
+  }
+}

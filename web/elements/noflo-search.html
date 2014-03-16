@@ -1,0 +1,243 @@
+<link rel="import" href="noflo-menu.html">
+<link rel="import" href="noflo-search-results.html">
+<link rel="import" href="noflo-graph-inspector.html">
+<polymer-element name="noflo-search" class="gpu" attributes="results graphs component">
+  <style>
+    noflo-search.overlay #breadcrumb {
+      width: calc(72px * 4);
+      display: block;
+    }
+    noflo-search #breadcrumb {
+      position: relative;
+      overflow: hidden;
+      width: 0px;
+      height: 72px;
+      left: 0px;
+      top: 0px;
+      z-index: 1;
+      
+      /*transition: width 0.3s ease-in-out;*/
+      display: none;
+      /*box-sizing: border-box;*/
+
+      background-color: hsla(0, 0%, 0%, 0.98) !important;
+      background-image: radial-gradient(1px at 0px 0px, hsl(210, 50%, 60%) 0.5px, hsla(0, 0%, 0%, 0) 1px);
+      background-size: calc(100% - 1px);
+      background-position: 0px;
+      border-bottom: 1px hsla(190, 90%, 80%, 0.2) solid;
+      
+    }
+    noflo-search #breadcrumb a#parentlink {
+      color: hsl(189, 11%, 26%);
+      text-decoration: none;
+      padding-right: 9px;
+    }
+    noflo-search #breadcrumb i.fa-search {
+      position: absolute;
+      line-height: 72px;
+      right: 72px;
+      font-size: 15px;
+      color: hsl(189, 11%, 26%);
+      cursor: text;
+    }
+    noflo-search #breadcrumb #graphinspector {
+      position: absolute;
+      right: 9px;
+      top: 0px;
+      line-height: 72px;
+      display: block;
+      height: 72px;
+      font-size: 15px;
+      color: hsl(189, 11%, 26%);
+    }
+    noflo-search #breadcrumb h1 {
+      display: inline-block;
+      line-height: 72px;
+      font-size: 15px;
+      margin: 0px;
+      padding: 0px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 156px;
+      font-weight: normal;
+      padding-left: 18px;
+    }
+    noflo-search.overlay #search {
+      display: none;
+    }
+    noflo-search #search {
+      display: block;
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      background-color: hsl(192, 25%, 92%);
+      color: black;
+      font-family: "SourceCodePro",Helvetica,Arial,sans-serif;
+      border: none;
+      padding: 0px;
+      padding-right: 18px;
+      padding-left: 18px;
+      width: calc(72px * 4 - 36px);
+      height: 72px;
+      /*box-sizing: border-box;*/
+      font-size: 12px;
+      display: inline;
+      background-image: radial-gradient(1px at 0px 0px, hsl(210, 50%, 60%) 0.5px, hsla(0, 0%, 0%, 0) 1px);
+      background-size: calc(100% - 1px);
+      background-position: 0px;
+      border-bottom: 1px hsla(190, 90%, 80%, 0.2) solid;
+      border-right: 1px hsla(190, 90%, 80%, 0.08) solid;
+    }
+    noflo-search #search::-webkit-input-placeholder {
+      color: hsl(190, 90%, 45%);
+    }
+    noflo-search #search #speech {
+      color: hsl(190, 90%, 45%);
+    }
+  </style>
+  <template>
+    <div id="breadcrumb" on-click="{{ focus }}">
+      <template if="{{ graph && (!component || !component.id) }}">
+      <i class="fa fa-search"></i>
+      <h1>
+        <template if="{{ parentPath }}">
+        <a href="#project/{{ project.id }}{{ parentPath }}" id="parentlink"><i class="fa fa-angle-left"></i></a>
+        </template>
+        {{ graph.name }}
+      </h1>
+      <button on-click="{{ showGraphInspector }}" id="graphinspector"><i class="fa fa-cog"></i></button>
+      </template>
+      <template if="{{ component && component.id }}">
+      <h1>
+        <template if="{{ parentPath }}">
+        <a href="#project/{{ project.id }}{{ parentPath }}" id="parentlink"><i class="fa fa-angle-left"></i></a>
+        </template>
+        {{ component.name }}
+      </h1>
+      </template>
+    </div>
+    <input id="search" value="{{ search }}" type="text" on-blur="{{ checkField }}" placeholder="Search" x-webkit-speech>
+  </template>
+  <script>
+    Polymer('noflo-search', {
+      menuCard: null,
+      resultsCard: null,
+      results: [],
+      search: '',
+      parentPath: '',
+      graph: null,
+      graphs: [],
+      component: null,
+      panel: null,
+      runtimes: [],
+      graphInspector: null,
+      graphsChanged: function () {
+        this.parentPath = '';
+        if (this.graphs.length) {
+          this.graphs.forEach(function (graph, idx) {
+            if (idx >= this.graphs.length - 1) {
+              return;
+            }
+            this.parentPath += '/' + graph.properties.id;
+          }.bind(this));
+          this.graph = this.graphs[this.graphs.length - 1];
+        } else {
+          this.graph = null;
+        }
+        if (this.graphInspector) {
+          if (this.graphInspector.parentNode) {
+            this.graphInspector.parentNode.removeChild(this.graphInspector);
+          }
+          this.graphInspector = null;
+        }
+        this.blur();
+      },
+      enteredView: function () {
+        this.observer = new ArrayObserver(this.results);
+        this.observer.open(this.resultsModified.bind(this));
+        this.blur();
+      },
+      focus: function () {
+        if (this.component && this.component.id) {
+          return;
+        }
+        this.classList.remove('overlay');
+        this.$.search.focus();
+      },
+      blur: function () {
+        this.clearResults();
+        this.classList.add('overlay');
+        this.search = '';
+      },
+      toggle: function () {
+        if (this.classList.contains('overlay')) {
+          this.focus();
+          return;
+        }
+        this.blur();
+      },
+      clearResults: function () {
+        while (this.results.length) {
+          this.results.pop();
+        }
+      },
+      checkField: function () {
+        event.preventDefault();
+        if (this.search === '') {
+          this.blur();
+          if (this.resultsCard) {
+            this.resultsCard.parentNode.removeChild(this.resultsCard);
+            this.resultsCard = null;
+          }
+          this.fire('search', this.search);
+          return;
+        }
+      },
+      searchChanged: function () {
+        this.clearResults();
+        if (this.resultsCard) {
+          this.resultsCard.getElementsByTagName('noflo-search-results')[0].search = this.search;
+        }
+        this.fire('search', this.search);
+      },
+      resultsModified: function () {
+        if (this.resultsCard || this.search === '') {
+          return;
+        }
+        if (this.results.length === 0) {
+          if (this.resultsCard) {
+            this.resultsCard.parentNode.removeChild(this.resultsCard);
+            this.resultsCard = null;
+          }
+          return;
+        }
+        var results = document.createElement('noflo-search-results');
+        results.results = this.results;
+        results.search = this.search;
+        results.addEventListener('resultclick', function () {
+          this.search = '';
+          this.blur();
+        }.bind(this));
+
+        this.resultsCard = document.createElement('the-card');
+        this.resultsCard.type = 'noflo-search-results';
+        this.resultsCard.appendChild(results);
+        this.resultsCard.addTo(this.panel, true);
+      },
+      showGraphInspector: function (event) {
+        if (event) {
+          event.stopPropagation();
+          event.preventDefault();
+        }
+        if (this.graphs.length === 0) {
+          return;
+        }
+        this.graphInspector = document.createElement('noflo-graph-inspector');
+        this.graphInspector.graph = this.graph;
+        this.graphInspector.project = this.project;
+        this.graphInspector.runtimes = this.runtimes;
+        this.parentNode.parentNode.appendChild(this.graphInspector);
+      },
+    });
+  </script>
+</polymer-element>

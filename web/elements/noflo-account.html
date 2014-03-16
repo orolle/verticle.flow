@@ -1,0 +1,252 @@
+<link rel="import" href="noflo-account-settings.html">
+<polymer-element name="noflo-account" attributes="clientid site gatekeeper">
+  <template>
+    <template if="{{ user }}">
+      <template if="{{ avatar }}">
+      <div class="avatar"><img src="{{ avatar }}"></div>
+      </template>
+      <template if="{{ !avatar }}">
+      <div class="avatar $NOFLO_THEME"><img src="../app/$NOFLO_THEME-logo-74.png"></div>
+      </template>
+      <h1>{{ user.name }} <a href="http://flowhub.io/preorder/" target="_blank" id="plan" class="{{ plan }}">{{ plan }}</a></h1>
+      <div class="toolbar">
+        <a on-click="{{ openSettings }}">Settings</a>
+        <button on-click="{{ logout }}">Logout</button>
+      </div>
+    </template>
+    <template if="{{ !user }}">
+      <div class="avatar $NOFLO_THEME"><img src="../app/$NOFLO_THEME-logo-74.png"></div>
+      <h1>$NOFLO_APP_TITLE</h1>
+      <div class="toolbar">
+        <a id="loginbutton" class="login" on-click="{{ login }}">Login</a>
+      </div>
+    </template>
+  </template>
+  <script>
+    (function () {
+      var storage = {
+        set: function (key, value, callback) {
+          localStorage.setItem(key, value);
+          if (callback) {
+            callback();
+          }
+        },
+        get: function (key, callback) {
+          callback(localStorage.getItem(key));
+        },
+        remove: function (key) {
+          localStorage.removeItem(key);
+        }
+      };
+      if (typeof chrome !== 'undefined' && chrome.storage) {
+        // Chrome App, use their storage API
+        storage.set = function (key, value, callback) {
+          var values = {};
+          values[key] = value;
+          chrome.storage.sync.set(values, callback);
+        };
+        storage.get = function (key, callback) {
+          chrome.storage.sync.get(key, function (items) {
+            callback(items[key]);
+          });
+        };
+        storage.remove = function (key) {
+          chrome.storage.sync.remove(key);
+        };
+      }
+
+      Polymer('noflo-account', {
+        clientid: '',
+        site: 'https://passport.thegrid.io',
+        gatekeeper: '$NOFLO_OAUTH_GATE',
+        redirect: '',
+        user: null,
+        plan: 'free',
+        gridToken: '',
+        githubToken: '',
+        avatar: '',
+        storage: {
+          grid: 'grid-token',
+          github: 'github-token',
+          user: 'grid-user',
+          avatar: 'grid-avatar'
+        },
+        help: null,
+        login: function () {
+          var button = document.getElementById('loginbutton');
+          button.innerHTML = '<i class="fa fa-spinner fa-spin"></i>';
+          if (typeof chrome !== 'undefined' && chrome.identity) {
+            this.redirect = chrome.identity.getRedirectURL();
+            chrome.identity.launchWebAuthFlow({
+              interactive: true,
+              url: this.getLoginUrl()
+            }, function (responseUrl) {
+              if (chrome.runtime.lastError) {
+                button.innerHTML = 'Login';
+                return;
+              }
+              this.remoteLogin(responseUrl, false);
+            }.bind(this));
+            return;
+          }
+          window.location.href = this.getLoginUrl();
+        },
+        getLoginUrl: function () {
+          return this.site + '/login/authorize/github_public?client_id=' + this.clientid  + '&scope=github&response_type=code&redirect_uri=' + encodeURIComponent(this.redirect);
+        },
+        enteredView: function () {
+          this.redirect = window.location.href;
+          this.help = document.querySelector('noflo-help');
+          this.checkLogin();
+        },
+        checkLogin: function () {
+          storage.get(this.storage.grid, function (token) {
+            if (token) {
+              this.gridToken = token;
+              return;
+            }
+            this.remoteLogin(window.location.href, true);
+          }.bind(this));
+          storage.get(this.storage.github, function (token) {
+            if (!token) {
+              return;
+            }
+            this.githubToken = token;
+          }.bind(this));
+        },
+        remoteLogin: function (responseUrl, cleanUp) {
+          var code = responseUrl.match(/\?code=(.*)/);
+          if (code && code[1]) {
+            var req = new XMLHttpRequest();
+            req.onreadystatechange = function () {
+              if (req.readyState !== 4) {
+                return;
+              }
+              if (req.status === 200) {
+                this.help.close();
+                var data = JSON.parse(req.responseText);
+                if (data.token) {
+                  // Save the access token
+                  storage.set(this.storage.grid, data.token, function () {
+                    // Clear old user data
+                    storage.remove(this.storage.user);
+
+                    if (cleanUp) {
+                      // Clean up URL
+                      var regex = new RegExp("(?:\\/)?\\?code=" + code[1]);
+                      window.location.href = window.location.href.replace(regex, '');
+                    } else {
+                      this.gridToken = data.token;
+                    }
+                  }.bind(this));
+                }
+              } else {
+                this.clearCache();
+              }
+            }.bind(this);
+            req.open('GET', this.gatekeeper + '/authenticate/' + code[1], true);
+            req.send(null);
+          } else {
+            this.help.show('New to $NOFLO_APP_TITLE?', 'Start by logging into your <a href="http://flowhub.io/" target="_blank">Flowhub</a> account, and you\'ll be able to synchronize projects with GitHub and download examples.');
+          }
+        },
+        getUser: function (token, refresh) {
+          if (refresh) {
+            this.getRemoteUser(token);
+            return;
+          }
+          storage.get(this.storage.user, function (user) {
+            if (user) {
+              try {
+                this.user = JSON.parse(user);
+                this.fire('user', this.user);
+                return;
+              } catch (e) {
+                storage.remove(this.storage.user);
+              }
+            }
+            this.getRemoteUser(token);
+          }.bind(this));
+        },
+        getRemoteUser:function (token) {
+          var req = new XMLHttpRequest();
+          req.onreadystatechange = function () {
+            if (req.readyState !== 4) {
+              return;
+            }
+            if (req.status === 200) {
+              storage.set(this.storage.user, req.responseText);
+              this.user = JSON.parse(req.responseText);
+              this.fire('user', this.user);
+              this.fire('login', this.user);
+              } else {
+              this.clearCache();
+            }
+          }.bind(this);
+          req.open('GET', this.site + '/api/user', true);
+          req.setRequestHeader('Authorization', 'Bearer ' + token);
+          req.send(null);
+        },
+        logout: function () {
+          this.user = null;
+          this.gridToken = '';
+          this.githubToken = '';
+          this.avatar = '';
+          this.clearCache();
+        },
+        openSettings: function () {
+          var dialog = document.createElement('noflo-account-settings');
+          dialog.githubtoken = this.githubToken;
+          dialog.user = this.user;
+          document.body.appendChild(dialog);
+          dialog.addEventListener('updated', function (event) {
+            this.githubToken = event.detail.githubtoken;
+            storage.set(this.storage.github, this.githubToken);
+          }.bind(this));
+        },
+        clearCache: function () {
+          storage.remove(this.storage.grid);
+          storage.remove(this.storage.github);
+          storage.remove(this.storage.user);
+          storage.remove(this.storage.avatar);
+        },
+        userChanged: function () {
+          if (!this.user || !this.user.avatar) {
+            return;
+          }
+          storage.get(this.storage.avatar, function (avatar) {
+            if (avatar) {
+              this.avatar = avatar;
+              return;
+            }
+            var req = new XMLHttpRequest();
+            var fileReader = new FileReader();
+            req.open('GET', this.user.avatar, true);
+            req.responseType = 'blob';
+            req.onload = function (e) {
+              if (req.status !== 200) {
+                return;
+              }
+              fileReader.onload = function (event) {
+                this.avatar = event.target.result;
+                storage.set(this.storage.avatar, this.avatar);
+              }.bind(this);
+              fileReader.readAsDataURL(req.response);
+
+            }.bind(this);
+            req.send();
+          }.bind(this));
+        },
+        gridTokenChanged: function () {
+          if (this.gridToken) {
+            this.getUser(this.gridToken);
+          }
+          this.fire('gridtoken', this.gridToken);
+        },
+        githubTokenChanged: function () {
+          this.fire('githubtoken', this.githubToken);
+        }
+      });
+    })();
+  </script>
+  </polymer-element>

@@ -1,0 +1,31 @@
+{
+  "name": "noflo-graph",
+  "description": "NoFlo components for NoFlo Graph manipulation",
+  "author": "Henri Bergius <henri.bergius@iki.fi>",
+  "repo": "noflo/noflo-graph",
+  "version": "0.1.0",
+  "keywords": [],
+  "dependencies": {
+    "noflo/noflo": "*"
+  },
+  "scripts": [
+    "components/CreateGraph.coffee",
+    "components/ListenChanges.coffee",
+    "components/LoadGraph.coffee",
+    "components/LoadJson.coffee",
+    "components/SetPropertyValue.coffee",
+    "index.js"
+  ],
+  "json": [
+    "component.json"
+  ],
+  "noflo": {
+    "components": {
+      "CreateGraph": "components/CreateGraph.coffee",
+      "ListenChanges": "components/ListenChanges.coffee",
+      "LoadGraph": "components/LoadGraph.coffee",
+      "LoadJson": "components/LoadJson.coffee",
+      "SetPropertyValue": "components/SetPropertyValue.coffee"
+    }
+  }
+}

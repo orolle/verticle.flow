@@ -1,0 +1,61 @@
+{
+  "name": "noflo-indexeddb",
+  "description": "IndexedDB components for NoFlo",
+  "author": "Henri Bergius <henri.bergius@iki.fi>",
+  "repo": "noflo/noflo-indexeddb",
+  "version": "0.1.0",
+  "keywords": [],
+  "dependencies": {
+    "noflo/noflo": "*"
+  },
+  "scripts": [
+    "components/Open.coffee",
+    "components/Close.coffee",
+    "components/DeleteDatabase.coffee",
+    "components/CreateStore.coffee",
+    "components/CreateIndex.coffee",
+    "components/DeleteStore.coffee",
+    "components/UpgradeRouter.coffee",
+    "components/BeginTransaction.coffee",
+    "components/AbortTransaction.coffee",
+    "components/GetStore.coffee",
+    "components/GetIndex.coffee",
+    "components/Query.coffee",
+    "components/QueryOnly.coffee",
+    "components/QueryFrom.coffee",
+    "components/QueryTo.coffee",
+    "components/Put.coffee",
+    "components/Get.coffee",
+    "components/Delete.coffee",
+    "index.js"
+  ],
+  "json": [
+    "component.json"
+  ],
+  "files": [
+    "vendor/IndexedDBShim.min.js"
+  ],
+  "noflo": {
+    "icon": "bitbucket",
+    "components": {
+      "Open": "components/Open.coffee",
+      "Close": "components/Close.coffee",
+      "DeleteDatabase": "components/DeleteDatabase.coffee",
+      "CreateStore": "components/CreateStore.coffee",
+      "CreateIndex": "components/CreateIndex.coffee",
+      "DeleteStore": "components/DeleteStore.coffee",
+      "UpgradeRouter": "components/UpgradeRouter.coffee",
+      "BeginTransaction": "components/BeginTransaction.coffee",
+      "AbortTransaction": "components/AbortTransaction.coffee",
+      "GetStore": "components/GetStore.coffee",
+      "GetIndex": "components/GetIndex.coffee",
+      "Query": "components/Query.coffee",
+      "QueryOnly": "components/QueryOnly.coffee",
+      "QueryFrom": "components/QueryFrom.coffee",
+      "QueryTo": "components/QueryTo.coffee",
+      "Put": "components/Put.coffee",
+      "Get": "components/Get.coffee",
+      "Delete": "components/Delete.coffee"
+    }
+  }
+}

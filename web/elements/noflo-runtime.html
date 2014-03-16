@@ -1,0 +1,390 @@
+<link rel="import" href="noflo-preview.html">
+<link rel="import" href="noflo-runtime-selector.html">
+<polymer-element name="noflo-runtime" attributes="graphs edges runtimes" class="gpu">
+  <style>
+    noflo-runtime {
+      position: fixed;
+      right: 36px;
+      padding-left: 18px;
+      box-sizing: border-box;
+      top: 0;
+      color: hsl(189, 11%, 26%);
+      z-index: 3;
+      width: 288px;
+      height: 72px;
+      background-color: hsla(0, 0%, 0%, 0.98) !important;
+      background-image: radial-gradient(1px at 0px 0px, hsl(210, 50%, 60%) 0.5px, hsla(0, 0%, 0%, 0) 1px);
+      background-size: calc(100% - 1px);
+      background-position: 0px;
+      border-bottom: 1px hsla(190, 90%, 80%, 0.2) solid;
+    }
+
+    noflo-runtime h2 {
+      font-size: 14px;
+      width: 216px;
+      font-weight: normal;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      line-height: 36px;
+      margin: 0px;
+      padding: 0px;
+    }
+
+    noflo-runtime #address h2 {
+      position: absolute;
+      left: 54px;
+      width: 180px;
+      top: 0px;
+      color: hsl(189, 11%, 26%);
+    }
+
+    noflo-runtime #address, noflo-runtime #address button {
+      color: #e70215;
+    }
+    noflo-runtime .online#address, noflo-runtime .online#address button {
+      color: #01d159;
+    }
+    noflo-runtime #address button.clear {
+      position: absolute;
+      right: 0px;
+      color: hsl(189, 11%, 26%);
+    }
+
+    noflo-runtime #runcontrol h2 {
+      position: absolute;
+      left: 54px;
+      top: 36px;
+    }
+    noflo-runtime #runcontrol button {
+      color: hsl(189, 11%, 26%);
+    }
+
+    noflo-runtime #select {
+      text-align: center;
+    }
+    noflo-runtime #select button.select {
+      width: auto;
+      height: auto;
+      background-color: hsl(190, 90%, 45%);
+      color: hsla(0, 0%, 0%, 0.98);
+      border: none;
+      font-size: 13px;
+      border-radius: 3px;
+      font-family: "SourceCodePro",Helvetica,Arial,sans-serif;
+      height: 36px;
+      padding-left: 36px;
+      padding-right: 36px;
+      margin: 0px;
+      margin-top: 18px;
+    }
+  </style>
+  <template>
+  <template if="{{ currentGraph }}">
+  <template if="{{ runtime }}">
+      <div id="address" class="{{ { online: online } | tokenList }}">
+        <button on-click="{{ reconnect }}"><i class="fa fa-refresh"></i></button>
+        <h2>{{ runtime.definition.address }}</h2>
+        <button on-click="{{ clearRuntime }}" class="clear"><i class="fa fa-exchange"></i></button>
+      </div>
+    <div id="runcontrol">
+      <template if="{{ online }}">
+        <template if="{{ execution.running }}">
+          <button class="stop" on-click="{{ stop }}"><i class="fa fa-pause"></i></button>
+        </template>
+        <template if="{{ execution.running == false }}">
+          <button class="start" on-click="{{ start }}"><i class="fa fa-play"></i></button>
+        </template>
+        <h2>{{ execution.label }}</h2>
+      </template>
+    </div>
+  </template>
+  <template if="{{ !runtime }}">
+    <div id="select">
+      <button on-click="{{ selectRuntime }}" class="select">Select runtime</button>
+    </div>
+  </template>
+  </template>
+  </template>
+  <script>
+    Polymer('noflo-runtime', {
+      currentGraph: null,
+      graphs: null,
+      runtime: null,
+      runtimes: [],
+      online: false,
+      execution: {
+        label: 'not started',
+        running: false
+      },
+      card: null,
+      panel: null,
+      edges: null,
+      wasConnected: false,
+      graphsChanged: function () {
+        if (!this.graphs || this.graphs.length === 0) {
+          this.currentGraph = null;
+          return;
+        }
+        // Use the top-level graph as the runtime main graph
+        this.currentGraph = this.graphs[0];
+      },
+      edgesChanged: function () {
+        this.sendEdges();
+      },
+      sendEdges: function () {
+        if (!this.runtime || !this.edges || !this.edges.map || !this.currentGraph) {
+          return;
+        }
+        var edgeData = this.edges.map(function (edge) {
+          return {
+            src: {
+              process: edge.from.node,
+              port: edge.from.port
+            },
+            tgt: {
+              process: edge.to.node,
+              port: edge.to.port
+            }
+          };
+        });
+        this.runtime.sendNetwork('edges', {
+          edges: edgeData,
+          graph: this.currentGraph.properties.id
+        });
+      },
+      clearRuntime: function () {
+        for (var i = 0; i < this.runtimes.length; i++) {
+          if (this.runtimes[i].graph === this.currentGraph.properties.id) {
+            this.runtimes[i].graph = null;
+            this.fire('runtime', this.runtimes[i]);
+          }
+        }
+        this.runtime = null;
+        this.currentGraphChanged();
+      },
+      currentGraphChanged: function () {
+        this.wasConnected = false;
+        if (this.runtime) {
+          this.stop();
+          this.execution.running = false;
+          this.execution.stopped = true;
+          this.runtime = null;
+        }
+        if (this.card) {
+          this.card.parentNode.removeChild(this.card);
+          this.card = null;
+        }
+        if (this.runtimeSelector) {
+          if (this.runtimeSelector.parentNode) {
+            this.runtimeSelector.parentNode.removeChild(this.runtimeSelector);
+          }
+          this.runtimeSelector = null;
+        }
+        if (!this.currentGraph || !this.currentGraph.properties.id) {
+          return;
+        }
+
+        // Fix legacy env type setting
+        this.updateGraphType(this.currentGraph);
+
+        // Subscribe to possible type changes
+        this.currentGraph.on('changeProperties', function (newProps, oldProps) {
+          if (newProps.environment.type !== oldProps.environment.type) {
+            this.currentGraphChanged();
+          }
+        }.bind(this));
+
+        // Find runtime for Graph
+        var iframeRuntime = null;
+        for (var i = 0; i < this.runtimes.length; i++) {
+          if (this.runtimes[i].graph === this.currentGraph.properties.id) {
+            this.fire('runtime', this.runtimes[i]);
+            return;
+          }
+          if (this.runtimes[i].protocol === 'iframe') {
+            iframeRuntime = this.runtimes[i];
+          }
+        }
+        if (this.currentGraph.properties.environment.type === 'noflo-browser' && iframeRuntime) {
+          // Fall-back, select the IFRAME runtime as default
+          this.fire('runtime', iframeRuntime);
+        }
+        return;
+      },
+      runtimeChanged: function () {
+        if (!this.runtime) {
+          return;
+        }
+        this.runtime.setMain(this.currentGraph);
+        this.runtime.on('status', function (status) {
+          this.online = status.online;
+          if (!this.online) {
+            this.hideCard();
+            this.execution.running = false;
+            this.execution.label = 'not started';
+            if (this.panel) {
+              this.panel.open = false;
+            }
+          }
+        }.bind(this));
+        this.runtime.on('execution', function (status) {
+          if (status.running) {
+            this.execution.running = true;
+          } else {
+            this.execution.running = false;
+          }
+          this.execution.label = status.label;
+        }.bind(this));
+        this.runtime.on('network', function (message) {
+          if (message.command === 'error') {
+            this.notify('Error', message.payload.message);
+            return;
+          }
+        }.bind(this));
+      },
+      updateGraphType: function (graph) {
+        var type = 'noflo-browser';
+        if (!graph.properties.environment) {
+          graph.setProperties({
+            environment: {
+              type: type
+            }
+          });
+        }
+        var env = JSON.parse(JSON.stringify(graph.properties.environment));
+        if (env.type) {
+          return;
+        }
+        switch (env.runtime) {
+          case 'noflo-vertigo':
+            type = 'noflo-vertigo';
+            break;
+          case 'websocket':
+            type = 'noflo-nodejs';
+            break;
+          default:
+            type = 'noflo-browser';
+            break;
+        }
+        console.log(JSON.stringify(env));
+        env.type = type;
+        graph.setProperties({
+          environment: env
+        });
+      },
+      start: function (event) {
+        event.preventDefault();
+        this.requestNotificationPermission();
+        if (this.card) {
+          this.sendEdges();
+          this.runtime.start();
+          return;
+        }
+        this.showCard();
+        if (this.runtime.getType() === 'iframe') {
+          this.runtime.once('connected', function () {
+            this.runtime.start();
+          }.bind(this));
+          return;
+        }
+        this.runtime.start();
+      },
+      stop: function (event) {
+        if (event) {
+          event.preventDefault();
+        }
+        this.runtime.stop();
+      },
+      reconnect: function (event) {
+        if (event) {
+          event.preventDefault();
+        }
+        this.runtime.reconnect();
+      },
+      showCard: function () {
+        if (this.card || !this.panel) {
+          return;
+        }
+        this.card = document.createElement('the-card');
+        this.card.type = 'noflo-runtime-preview';
+        // Move the preview element of the runtime into the card
+        var preview = document.createElement('noflo-preview');
+        preview.classList.add('the-card-content');
+        preview.runtime = this.runtime;
+        preview.returnTo = this.parentNode;
+        this.card.appendChild(preview);
+        this.card.addTo(this.panel.getMain());
+        this.panel.open = true;
+
+        // Handle maximization
+        var originalSize = this.panel.size;
+        preview.addEventListener('maximized', function (e) {
+          if (e.detail === true) {
+            this.panel.size = window.innerWidth - 36;
+          } else {
+            this.panel.size = originalSize;
+          }
+        }.bind(this));
+      },
+      hideCard: function () {
+        if (!this.card) {
+          return;
+        }
+        var el = this.runtime.getElement();
+        this.card.parentNode.removeChild(this.card);
+        this.card = null;
+      },
+      selectRuntime: function () {
+        if (this.graphs.length === 0) {
+          return;
+        }
+        this.runtimeSelector = document.createElement('noflo-runtime-selector');
+        this.runtimeSelector.graph = this.currentGraph;
+        this.runtimeSelector.runtimes = this.runtimes;
+        this.runtimeSelector.addEventListener('runtime', function (event) {
+          var runtime = event.detail;
+          runtime.graph = this.currentGraph.properties.id;
+          this.fire('runtime', runtime);
+          this.fire('changed', runtime);
+        }.bind(this));
+        this.parentNode.parentNode.appendChild(this.runtimeSelector);
+      },
+      canNotify: function () {
+        if (!window.webkitNotifications) {
+          return false;
+        }
+        return true;
+      },
+      allowedToNotify: function () {
+        if (!this.canNotify()) {
+          return false;
+        }
+        if (window.webkitNotifications.checkPermission() !== 0) {
+          return false;
+        }
+        return true;
+      },
+      requestNotificationPermission: function () {
+        if (!this.canNotify()) {
+          return;
+        }
+        if (this.allowedToNotify()) {
+          return;
+        }
+        window.webkitNotifications.requestPermission();
+      },
+      notify: function (title, message) {
+        if (!this.allowedToNotify()) {
+          if (!console || !console.log) {
+            return;
+          }
+          console.log(title + ': ' + message);
+          return;
+        }
+        var notification = window.webkitNotifications.createNotification('app/noflo.png', title, message);
+        notification.show();
+      }
+    });
+  </script>
+</polymer-element>

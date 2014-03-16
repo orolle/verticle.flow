@@ -1,0 +1,66 @@
+{
+  "name": "noflo-ui",
+  "description": "NoFlo Development Environment",
+  "author": "Henri Bergius <henri.bergius@iki.fi>",
+  "repo": "noflo/noflo-ui",
+  "version": "0.1.0",
+  "keywords": [
+    "fbp",
+    "noflo",
+    "graph",
+    "visual",
+    "dataflow"
+  ],
+  "dependencies": {
+    "noflo/noflo": "*",
+    "noflo/noflo-strings": "*",
+    "noflo/noflo-ajax": "*",
+    "noflo/noflo-localstorage": "*",
+    "noflo/noflo-interaction": "*",
+    "noflo/noflo-objects": "*",
+    "noflo/noflo-groups": "*",
+    "noflo/noflo-dom": "*",
+    "noflo/noflo-core": "*",
+    "noflo/noflo-polymer": "*",
+    "noflo/noflo-indexeddb": "*",
+    "noflo/noflo-github": "*",
+    "noflo/noflo-graph": "*",
+    "noflo/noflo-runtime": "*",
+    "the-grid/flowhub-registry": "*",
+    "gjohnson/uuid": "*"
+  },
+  "noflo": {
+    "components": {
+      "ConnectRuntime": "components/ConnectRuntime.coffee",
+      "GenerateId": "components/GenerateId.coffee",
+      "IgnoreExamples": "components/IgnoreExamples.coffee",
+      "Router": "components/Router.coffee",
+      "MigrateLocalStorage": "components/MigrateLocalStorage.coffee",
+      "MakePath": "components/MakePath.coffee"
+    }
+  },
+  "main": "index.js",
+  "scripts": [
+    "index.js",
+    "components/ConnectRuntime.coffee",
+    "components/GenerateId.coffee",
+    "components/IgnoreExamples.coffee",
+    "components/Router.coffee",
+    "components/MigrateLocalStorage.coffee",
+    "components/MakePath.coffee",
+    "src/JournalStore.coffee"
+  ],
+  "json": [
+    "component.json"
+  ],
+  "files": [
+    "css/noflo-ui.css",
+    "preview/iframe.html",
+    "preview/package.json",
+    "preview/component.json",
+    "index.html",
+    "noflo.ico",
+    "app/noflo-200.png",
+    "examples.json"
+  ]
+}

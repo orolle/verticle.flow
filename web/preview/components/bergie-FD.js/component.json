@@ -1,0 +1,9 @@
+{
+  "name": "fdjs",
+  "description": "Finite domain constraint programming library",
+  "repo": "srikumarks/FD.js",
+  "main": "fd.js",
+  "scripts": [
+    "fd.js"
+  ]
+}

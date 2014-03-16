@@ -1,0 +1,61 @@
+{
+  "name": "noflo-packets",
+  "description": "The best project ever.",
+  "version": "0.0.8",
+  "author": "Kenneth Kan <kenhkan@gmail.com>",
+  "repo": "kenhkan/packets",
+  "keywords": [],
+  "dependencies": {
+    "noflo/noflo": "*",
+    "component/underscore": "*"
+  },
+  "scripts": [
+    "components/CountPackets.coffee",
+    "components/Unzip.coffee",
+    "components/Defaults.coffee",
+    "components/DoNotDisconnect.coffee",
+    "components/OnlyDisconnect.coffee",
+    "components/SplitPacket.coffee",
+    "components/Range.coffee",
+    "components/Flatten.coffee",
+    "components/Compact.coffee",
+    "components/Zip.coffee",
+    "components/SendWith.coffee",
+    "components/FilterPackets.coffee",
+    "components/FilterByValue.coffee",
+    "components/FilterByPosition.coffee",
+    "components/FilterPacket.coffee",
+    "components/UniquePacket.coffee",
+    "components/GroupByPacket.coffee",
+    "components/LastPacket.coffee",
+    "components/Counter.coffee",
+    "index.js"
+  ],
+  "json": [
+    "component.json"
+  ],
+  "noflo": {
+    "icon": "dropbox",
+    "components": {
+      "CountPackets": "components/CountPackets.coffee",
+      "Unzip": "components/Unzip.coffee",
+      "Defaults": "components/Defaults.coffee",
+      "DoNotDisconnect": "components/DoNotDisconnect.coffee",
+      "OnlyDisconnect": "components/OnlyDisconnect.coffee",
+      "SplitPacket": "components/SplitPacket.coffee",
+      "Range": "components/Range.coffee",
+      "Flatten": "components/Flatten.coffee",
+      "Compact": "components/Compact.coffee",
+      "Zip": "components/Zip.coffee",
+      "SendWith": "components/SendWith.coffee",
+      "FilterPackets": "components/FilterPackets.coffee",
+      "FilterByValue": "components/FilterByValue.coffee",
+      "FilterByPosition": "components/FilterByPosition.coffee",
+      "FilterPacket": "components/FilterPacket.coffee",
+      "UniquePacket": "components/UniquePacket.coffee",
+      "GroupByPacket": "components/GroupByPacket.coffee",
+      "LastPacket": "components/LastPacket.coffee",
+      "Counter": "components/Counter.coffee"
+    }
+  }
+}

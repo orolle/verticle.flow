@@ -1,0 +1,306 @@
+{
+  "properties": {
+    "name": "ListenPointer"
+  },
+  "exports": [
+    {
+      "private": "Listen_1025g.element",
+      "public": "element"
+    },
+    {
+      "private": "Listen_1025g.capture",
+      "public": "capture"
+    },
+    {
+      "private": "StartEvent_x8itv.out",
+      "public": "start"
+    },
+    {
+      "private": "MoveEvent_qa3pp.out",
+      "public": "move"
+    },
+    {
+      "private": "EndEvent_hmwp9.out",
+      "public": "end"
+    }
+  ],
+  "processes": {
+    "Listen_1025g": {
+      "component": "interaction/ListenPointer",
+      "metadata": {
+        "x": 500,
+        "y": -65,
+        "label": "Listen"
+      }
+    },
+    "End_vom22": {
+      "component": "core/Merge",
+      "metadata": {
+        "x": 843,
+        "y": 96,
+        "label": "End"
+      }
+    },
+    "Start_86u3g": {
+      "component": "core/Split",
+      "metadata": {
+        "x": 848,
+        "y": -157,
+        "label": "Start"
+      }
+    },
+    "MoveOnlyDuringGesture_986zt": {
+      "component": "flow/Gate",
+      "metadata": {
+        "x": 1106,
+        "y": -40,
+        "label": "MoveOnlyDuringGesture"
+      }
+    },
+    "EndOnlyOnce_vexfn": {
+      "component": "flow/Gate",
+      "metadata": {
+        "x": 1107,
+        "y": 75,
+        "label": "EndOnlyOnce"
+      }
+    },
+    "SplitEnd_cnfy6": {
+      "component": "core/Split",
+      "metadata": {
+        "x": 1407,
+        "y": 79,
+        "label": "SplitEnd"
+      }
+    },
+    "Asynchronize_x0hqm": {
+      "component": "core/RepeatAsync",
+      "metadata": {
+        "x": 1404,
+        "y": 171.33333333333331,
+        "label": "Asynchronize"
+      }
+    },
+    "StartEvent_x8itv": {
+      "component": "core/Repeat",
+      "metadata": {
+        "x": 1662,
+        "y": -162,
+        "label": "StartEvent"
+      }
+    },
+    "MoveEvent_qa3pp": {
+      "component": "core/Repeat",
+      "metadata": {
+        "x": 1662,
+        "y": -35,
+        "label": "MoveEvent"
+      }
+    },
+    "EndEvent_hmwp9": {
+      "component": "core/Repeat",
+      "metadata": {
+        "x": 1659,
+        "y": 75,
+        "label": "EndEvent"
+      }
+    }
+  },
+  "connections": [
+    {
+      "src": {
+        "process": "Listen_1025g",
+        "port": "leave"
+      },
+      "tgt": {
+        "process": "End_vom22",
+        "port": "in"
+      },
+      "metadata": {
+        "route": 1
+      }
+    },
+    {
+      "src": {
+        "process": "Listen_1025g",
+        "port": "cancel"
+      },
+      "tgt": {
+        "process": "End_vom22",
+        "port": "in"
+      },
+      "metadata": {
+        "route": 1
+      }
+    },
+    {
+      "src": {
+        "process": "Listen_1025g",
+        "port": "up"
+      },
+      "tgt": {
+        "process": "End_vom22",
+        "port": "in"
+      },
+      "metadata": {
+        "route": 1
+      }
+    },
+    {
+      "src": {
+        "process": "Listen_1025g",
+        "port": "down"
+      },
+      "tgt": {
+        "process": "Start_86u3g",
+        "port": "in"
+      },
+      "metadata": {
+        "route": 5
+      }
+    },
+    {
+      "src": {
+        "process": "Listen_1025g",
+        "port": "move"
+      },
+      "tgt": {
+        "process": "MoveOnlyDuringGesture_986zt",
+        "port": "in"
+      },
+      "metadata": {
+        "route": 3
+      }
+    },
+    {
+      "src": {
+        "process": "End_vom22",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "EndOnlyOnce_vexfn",
+        "port": "in"
+      },
+      "metadata": {
+        "route": 1
+      }
+    },
+    {
+      "src": {
+        "process": "EndOnlyOnce_vexfn",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "SplitEnd_cnfy6",
+        "port": "in"
+      },
+      "metadata": {
+        "route": 1
+      }
+    },
+    {
+      "src": {
+        "process": "Start_86u3g",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "EndOnlyOnce_vexfn",
+        "port": "open"
+      },
+      "metadata": {
+        "route": 5
+      }
+    },
+    {
+      "src": {
+        "process": "SplitEnd_cnfy6",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "Asynchronize_x0hqm",
+        "port": "in"
+      },
+      "metadata": {
+        "route": 1
+      }
+    },
+    {
+      "src": {
+        "process": "Asynchronize_x0hqm",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "EndOnlyOnce_vexfn",
+        "port": "close"
+      },
+      "metadata": {
+        "route": 1
+      }
+    },
+    {
+      "src": {
+        "process": "Start_86u3g",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "MoveOnlyDuringGesture_986zt",
+        "port": "open"
+      },
+      "metadata": {
+        "route": 5
+      }
+    },
+    {
+      "src": {
+        "process": "SplitEnd_cnfy6",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "MoveOnlyDuringGesture_986zt",
+        "port": "close"
+      },
+      "metadata": {
+        "route": 1
+      }
+    },
+    {
+      "src": {
+        "process": "Start_86u3g",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "StartEvent_x8itv",
+        "port": "in"
+      },
+      "metadata": {
+        "route": 5
+      }
+    },
+    {
+      "src": {
+        "process": "MoveOnlyDuringGesture_986zt",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "MoveEvent_qa3pp",
+        "port": "in"
+      },
+      "metadata": {
+        "route": 3
+      }
+    },
+    {
+      "src": {
+        "process": "SplitEnd_cnfy6",
+        "port": "out"
+      },
+      "tgt": {
+        "process": "EndEvent_hmwp9",
+        "port": "in"
+      },
+      "metadata": {
+        "route": 1
+      }
+    }
+  ]
+}

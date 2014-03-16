@@ -1,0 +1,301 @@
+<link rel="import" href="../bower_components/the-panel/the-panel/the-panel.html">
+<link rel="import" href="../bower_components/the-graph/the-graph-thumb/the-graph-thumb.html">
+<link rel="import" href="noflo-new-graph.html">
+<link rel="import" href="noflo-new-component.html">
+<link rel="import" href="noflo-project-inspector.html">
+<polymer-element name="noflo-project" attributes="project graphs components githubtoken graphs component">
+  <style>
+    noflo-project h2 {
+      font-size: 16px;
+      line-height: 36px;
+      text-transform: none;
+      font-weight: normal;
+      padding: 0px;
+      margin: 0px;
+    }
+    noflo-project ul.graphs li {
+      width: 245px;
+      height: 70px;
+      overflow: hidden;
+      float: left;
+      text-align: center;
+      background-color: hsl(190, 90%, 45%);
+      color: black;
+      border-radius: 3px;
+      margin-right: 0px;
+      margin-left: 0px;
+      margin-bottom: 5px;
+      position: relative;
+      cursor: pointer;
+    }
+    noflo-project ul.graphs li.add {
+      background-color: hsl(192, 25%, 92%);
+      color: black;
+      cursor: default;
+    }
+    noflo-project ul.graphs li the-graph-thumb {
+      display: block;
+      position: absolute;
+      left: 100px;
+      top: -20px;
+    }
+    noflo-project ul.graphs li i.fa {
+      display: block;
+      position: absolute;
+      right: 17px;
+      top: 17px;
+      font-size: 36px;
+      color: black;
+    }
+    noflo-project ul.graphs li button {
+      display: block;
+      position: absolute;
+      right: 17px;
+      top: 17px;
+      background-color: transparent;
+      color: hsl(189, 11%, 26%);
+      border: 1px solid hsl(189, 11%, 26%);
+      font-size: 13px;
+      border-radius: 3px;
+      font-family: "SourceCodePro",Helvetica,Arial,sans-serif;
+      height: 36px;
+      padding-left: 13px;
+      padding-right: 13px;
+    }
+    noflo-project ul.graphs li h2 {
+      position: absolute;
+      top: 18px;
+      left: 17px;
+      width: 75px;
+      text-transform: none;
+      font-size: 13px;
+      text-align: left;
+      white-space: nowrap;
+    }
+    noflo-project main {
+      padding-bottom: 144px;
+      overflow-y: auto;
+      max-height: calc(100% - 180px);
+    }
+    noflo-project main::-webkit-scrollbar {
+      display: none;
+    }
+    noflo-project footer {
+      background-color: hsla(0, 0%, 0%, 0.98);
+      display: block;
+      position: absolute;
+      bottom: 0px;
+      left: 0px;
+      padding-left: 36px;
+      width: 325px;
+      padding-right: 36px;
+      box-sizing: border-box;
+      overflow: hidden;
+      height: 144px;
+      transition: background-color 0.3s ease-in-out;
+    }
+    the-panel#account[open] footer {
+      background-color: hsl(190, 90%, 45%);
+    }
+    noflo-project footer h1 {
+      font-size: 17px;
+      line-height: 36px;
+      text-align: center;
+    }
+    noflo-project footer textarea {
+      display: block;
+      font-size: 13px;
+      background-color: rgba(0, 42, 51, 0.498039);
+      font-family: "SourceCodePro",Helvetica,Arial,sans-serif;
+      color: white;
+      border-radius: 3px;
+      padding: 3px;
+      border: none;
+      margin: 0px;
+      width: calc(100% - 2px);
+      height: 54px;
+      box-sizing: border-box;
+      margin-left: auto;
+      margin-right: auto;
+      resize: none;
+    }
+    noflo-project footer button {
+      background-color: white;
+      color: hsl(190, 90%, 45%);
+      border: none;
+      font-size: 13px;
+      border-radius: 3px;
+      font-family: "SourceCodePro",Helvetica,Arial,sans-serif;
+      height: 36px;
+      padding-left: 17px;
+      padding-right: 17px;
+      line-height: 36px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      margin-top: 8px;
+    }
+  </style>
+  <template>
+    <the-panel id="account" edge="left" size="324" handle="36" automatic="false">
+      <header>
+        <template if="{{ project }}">
+        <h1>{{ project.name }}</h1>
+        </template>
+        <template if="{{ !project }}">
+        <h1>Sketch</h1>
+        </template>
+      </header>
+      <main>
+        <ul>
+          <li><a on-click="{{ openHome }}"><i class="fa fa-home"></i>Home</a></li>
+          <li><a on-click="{{ openSettings }}"><i class="fa fa-cog"></i>Settings</a></li>
+        </ul>
+        <template if="{{ project }}">
+        <h2>Graphs</h2>
+        <ul class="graphs">
+          <li class="add">
+            <h2>New graph</h2>
+            <button on-click="{{ newGraph }}">Create</button>
+          </li>
+          <template repeat="{{ graph in project.graphs }}">
+          <li on-click="{{ openGraph }}" data-id="{{ graph.properties.id }}">
+            <the-graph-thumb graph="{{ graph }}" width="200" height="120"></the-graph-thumb>
+            <h2>{{ graph.name }}</h2>
+          </li>
+          </template>
+        </ul>
+        <h2>Components</h2>
+        <ul class="graphs">
+          <li class="add">
+            <h2>New component</h2>
+            <button on-click="{{ newComponent }}">Create</button>
+          </li>
+          <template repeat="{{ component in project.components }}">
+          <li on-click="{{ openComponent }}" data-id="{{ component.name }}">
+            <h2>{{ component.name }}</h2>
+            <template if="{{ component.language == 'coffeescript' }}">
+            <i class="fa fa-coffee"></i>
+            </template>
+            <template if="{{ component.language != 'coffeescript' }}">
+            <i class="fa fa-code"></i>
+            </template>
+          </li>
+          </template>
+        </ul>
+        </template>
+      </main>
+      <template if="{{ project.repo && githubtoken}}">
+      <footer>
+        <h1><i class="fa fa-github"></i> {{ project.repo }}</h1>
+        <textarea placeholder="Commit message" value="{{ commitMessage }}"></textarea>
+        <button on-click="{{ upload }}"><i class="fa fa-cloud-upload"></i>
+          <template if="{{ graph }}">
+          Upload {{ graph.properties.name }}
+          </template>
+          <template if="{{ component && !graph }}">
+          Upload {{ component.name }}
+          </template>
+        </button>
+      </footer>
+      </template>
+    </the-panel>
+  </template>
+  <script>
+    Polymer('noflo-project', {
+      project: null,
+      commitMessage: '',
+      githubtoken: '',
+      graphs: [],
+      runtimes: [],
+      graph: null,
+      component: null,
+      graphsChanged: function () {
+        if (this.graphs.length) {
+          this.graph = this.graphs[this.graphs.length - 1];
+        } else {
+          this.graph = null;
+        }
+      },
+      newGraph: function (event) {
+        event.preventDefault();
+        var dialog = document.createElement('noflo-new-graph');
+        dialog.project = this.project.id;
+        dialog.runtimes = this.runtimes;
+        this.parentNode.parentNode.appendChild(dialog);
+        dialog.addEventListener('new', function (event) {
+          this.project.graphs.push(event.detail);
+          this.fire('newgraph', event.detail);
+        }.bind(this));
+      },
+      newComponent: function (event) {
+        event.preventDefault();
+        var dialog = document.createElement('noflo-new-component');
+        dialog.project = this.project.id;
+        this.parentNode.parentNode.appendChild(dialog);
+        dialog.addEventListener('new', function (event) {
+          this.project.components.push(event.detail);
+          this.fire('newcomponent', event.detail);
+        }.bind(this));
+      },
+      openHome: function (event) {
+        event.preventDefault();
+        this.$.account.toggleOpen(false);
+        window.location.hash = '#';
+      },
+      openSettings: function (event) {
+        event.preventDefault();
+        var dialog = document.createElement('noflo-project-inspector');
+        dialog.project = this.project;
+        this.parentNode.parentNode.appendChild(dialog);
+        dialog.addEventListener('updated', function (event) {
+          Object.keys(event.detail).forEach(function (property) {
+            this.project[property] = event.detail[property];
+          }.bind(this));
+
+          // Send only the data we actually want to store
+          this.fire('changed', {
+            id: this.project.id,
+            name: this.project.name,
+            repo: this.project.repo,
+            type: this.project.type,
+            main: this.project.main,
+            graphs: [],
+            components: []
+          });
+        }.bind(this));
+      },
+      openGraph: function (event, detail, sender) {
+        event.preventDefault();
+        this.$.account.toggleOpen(false);
+        window.location.hash = '#project/' + this.project.id + '/' + sender.getAttribute('data-id');
+      },
+      openComponent: function (event, detail, sender) {
+        event.preventDefault();
+        this.$.account.toggleOpen(false);
+        window.location.hash = '#project/' + this.project.id + '/component/' + sender.getAttribute('data-id');
+      },
+      upload: function (event) {
+        event.preventDefault();
+        if (!this.githubtoken) {
+          return;
+        }
+        var content;
+        if (this.graph) {
+          content = JSON.stringify(this.graph, null, 4);
+        }
+        if (this.component && !this.graph) {
+          content = this.component.code;
+        }
+        this.fire('upload', {
+          repo: this.project.repo,
+          doc: this.graph || this.component,
+          content: content,
+          token: this.githubtoken,
+          message: this.commitMessage
+        });
+        this.commitMessage = '';
+      }
+    });
+  </script>
+</polymer-element>

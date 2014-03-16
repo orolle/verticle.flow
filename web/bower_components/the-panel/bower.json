@@ -1,0 +1,19 @@
+{
+  "name": "the-panel",
+  "version": "0.0.1",
+  "authors": [
+    "Henri Bergius <henri.bergius@iki.fi>"
+  ],
+  "description": "Polymer components for UI panels",
+  "license": "MIT",
+  "dependencies": {
+    "polymer": "~0.2.0"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

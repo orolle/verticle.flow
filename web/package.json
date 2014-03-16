@@ -1,0 +1,48 @@
+{
+  "name": "noflo-ui",
+  "description": "NoFlo Development Environment",
+  "version": "0.1.0",
+  "author": {
+    "name": "Henri Bergius",
+    "email": "henri.bergius@iki.fi"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/noflo/noflo-ui.git"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "undefined/blob/master/LICENSE-MIT"
+    }
+  ],
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-coffee": "~0.7.0",
+    "grunt-coffeelint": "~0.0.6",
+    "chai": "~1.5.0",
+    "mocha": "~1.9.0",
+    "grunt-contrib-uglify": "~0.2.0",
+    "grunt-contrib-watch": "~0.3.1",
+    "grunt-contrib-compress": "~0.5.2",
+    "grunt-phonegap-build": "0.0.8",
+    "component-builder": "git://github.com/bergie/builder.js.git#patch-1",
+    "component-json": "~0.1.4",
+    "component-coffee": "~0.1.4",
+    "grunt-exec": "~0.4.2",
+    "component": "~0.17.6",
+    "bower": "~1.2.7",
+    "grunt-lint-inline": "~0.3.1",
+    "vulcanize": "~0.1.15",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-string-replace": "^0.2.7",
+    "grunt-zip": "^0.13.0",
+    "grunt-gh-pages": "^0.9.1"
+  },
+  "scripts": {
+    "postinstall": "cd preview && npm install && cd ..",
+    "test": "grunt test"
+  },
+  "keywords": []
+}
