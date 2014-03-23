@@ -1,6 +1,7 @@
-package net.orolle.vertigo.fbp.protocol;
+package net.orolle.vertigo.ui.protocol;
 
-import net.orolle.vertigo.fbp.data.FbpUser;
+import net.orolle.vertigo.ui.data.FbpVertigo;
+import net.orolle.vertigo.ui.data.FbpUser;
 
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
@@ -22,7 +23,10 @@ public class ComponentSubProtocol extends SubProtocolStub {
       @Override
       public void handle(JsonObject msg) {
         user.log.info("[component,list]");
-        user.listComponents();
+        
+        for (JsonObject comp : user.components()) {
+          sendComponent(comp);
+        }
       }
     });
     
@@ -30,7 +34,10 @@ public class ComponentSubProtocol extends SubProtocolStub {
       @Override
       public void handle(JsonObject msg) {
         user.log.info("[component,source]");
-        user.addComponent(msg.getObject("payload", EMPTY));
+        JsonObject comp = FbpVertigo.createComponent(msg.getObject("payload", EMPTY).getString("name"));
+        
+        user.addComponent(comp);
+        sendComponent(comp);
       }
     });
 
@@ -40,5 +47,12 @@ public class ComponentSubProtocol extends SubProtocolStub {
         throw new IllegalStateException("NOT IMPLEMENTED:\n"+msg.encodePrettily()+"\n");
       }
     });
+  }
+  
+  private FbpUser sendComponent(JsonObject component){
+    JsonObject reply = new JsonObject().putString("protocol", "component")
+        .putString("command", "list")
+        .putObject("payload", component);
+    return user.send(reply);
   }
 }

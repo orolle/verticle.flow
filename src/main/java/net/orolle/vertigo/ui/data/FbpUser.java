@@ -1,13 +1,14 @@
-package net.orolle.vertigo.fbp.data;
+package net.orolle.vertigo.ui.data;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import net.orolle.vertigo.fbp.protocol.ComponentSubProtocol;
-import net.orolle.vertigo.fbp.protocol.FbpNetworkProtocol;
-import net.orolle.vertigo.fbp.protocol.GraphSubProtocol;
-import net.orolle.vertigo.fbp.protocol.NetworkSubProtocol;
-import net.orolle.vertigo.fbp.protocol.RuntimeSubProtocol;
+import net.orolle.vertigo.ui.data.jgrapht.JgGraph;
+import net.orolle.vertigo.ui.protocol.ComponentSubProtocol;
+import net.orolle.vertigo.ui.protocol.FbpNetworkProtocol;
+import net.orolle.vertigo.ui.protocol.GraphSubProtocol;
+import net.orolle.vertigo.ui.protocol.NetworkSubProtocol;
+import net.orolle.vertigo.ui.protocol.RuntimeSubProtocol;
 
 import org.vertx.java.core.Vertx;
 import org.vertx.java.core.buffer.Buffer;
@@ -24,7 +25,7 @@ public class FbpUser extends FbpNetworkProtocol {
   public final Vertx vertx;
   public final Container container;
   
-  private final FbpEnvironment env;
+  public final FbpEnvironment env;
   private final List<JsonObject> components = new ArrayList<>();
 
   public FbpUser(FbpEnvironment env, ServerWebSocket ws) {
@@ -41,7 +42,7 @@ public class FbpUser extends FbpNetworkProtocol {
     env.addUser(this);
   }
 
-  private List<JsonObject> aggregateComponents() {
+  public List<JsonObject> components() {
     ArrayList<JsonObject> comps = new ArrayList<>
     (components.size() + env.listComponents().size());
 
@@ -55,25 +56,8 @@ public class FbpUser extends FbpNetworkProtocol {
     return comps;
   }
   
-  /**
-   * Lists all components to the UI client
-   * @return
-   */
-  public FbpUser listComponents(){
-    List<JsonObject> comps = aggregateComponents();
-    
-    for (JsonObject component : comps) {
-      writeComponent(component);
-    }
-    
-    return this;
-  }
-  
-  private FbpUser writeComponent(JsonObject component){
-    JsonObject reply = new JsonObject().putString("protocol", "component")
-        .putString("command", "list")
-        .putObject("payload", component);
-    ws.write(new Buffer(reply.encode()));
+  public FbpUser send(JsonObject msg){
+    ws.write(new Buffer(msg.encode()));
     return this;
   }
 
@@ -83,11 +67,6 @@ public class FbpUser extends FbpNetworkProtocol {
    * @return
    */
   public FbpUser addComponent(JsonObject newComponent) {
-    if(newComponent.getString("name") == null || newComponent.getString("code") == null){
-      log.warn("FbpUser.addComponent(): Component has not right structure: "+newComponent.toString());
-      return this;
-    }
-    
     for (int i = 0; i < this.components.size(); i++) {
       JsonObject o = this.components.get(i);
       
@@ -95,10 +74,7 @@ public class FbpUser extends FbpNetworkProtocol {
         this.components.remove(i);
       }
     }
-    
-    JsonObject uiComponent = env.createComponent(newComponent.getString("name"));
-    this.components.add(uiComponent);
-    this.writeComponent(uiComponent);
+    this.components.add(newComponent);
     
     return this;
   }
@@ -109,5 +85,13 @@ public class FbpUser extends FbpNetworkProtocol {
   @Override
   public void onWebsocketClose() {
     env.removeUser(this);
+  }
+
+  public JgGraph graph(String string) {
+    return env.graph(string);
+  }
+  
+  public JgGraph graphClear(String string) {
+    return env.graphClear(string);
   }
 }

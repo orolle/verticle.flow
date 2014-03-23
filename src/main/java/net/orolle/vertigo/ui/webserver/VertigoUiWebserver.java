@@ -1,4 +1,4 @@
-package net.orolle.vertigo.fbp.webserver;
+package net.orolle.vertigo.ui.webserver;
 
 import java.io.File;
 
@@ -52,7 +52,13 @@ public class VertigoUiWebserver {
       server.requestHandler(staticHandler());
     }
 
-    server.websocketHandler(wsHandler);
+    server.websocketHandler(new Handler<ServerWebSocket>() {
+      @Override
+      public void handle(ServerWebSocket ws) {
+        if("/fbpnp".equals(ws.path()))
+          wsHandler.handle(ws);
+      }
+    });
 
     server.listen(config.getNumber("port", DEFAULT_PORT).intValue(), config.getString("host", DEFAULT_ADDRESS), new AsyncResultHandler<HttpServer>() {
       @Override

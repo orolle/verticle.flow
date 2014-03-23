@@ -1,4 +1,4 @@
-package net.orolle.vertigo.fbp.protocol;
+package net.orolle.vertigo.ui.protocol;
 
 import java.util.HashMap;
 import java.util.Map;

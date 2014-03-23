@@ -1,6 +1,6 @@
-package net.orolle.vertigo.fbp.protocol;
+package net.orolle.vertigo.ui.protocol;
 
-import net.orolle.vertigo.fbp.data.FbpUser;
+import net.orolle.vertigo.ui.data.FbpUser;
 
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;

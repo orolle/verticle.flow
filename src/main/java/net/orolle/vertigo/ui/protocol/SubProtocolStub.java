@@ -1,12 +1,12 @@
-package net.orolle.vertigo.fbp.protocol;
+package net.orolle.vertigo.ui.protocol;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import net.orolle.vertigo.ui.data.FbpUser;
+
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
-
-import net.orolle.vertigo.fbp.data.FbpUser;
 
 /**
  * A stub which all sub protocols (component, graph, etc.)
@@ -34,5 +34,9 @@ public class SubProtocolStub {
    */
   public Map<String, Handler<JsonObject>> handlers(){
     return handlers;
+  }
+  
+  public JsonObject payload(JsonObject msg){
+    return msg.getObject("payload");
   }
 }

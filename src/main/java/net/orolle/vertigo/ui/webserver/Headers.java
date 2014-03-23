@@ -1,4 +1,4 @@
-package net.orolle.vertigo.fbp.webserver;
+package net.orolle.vertigo.ui.webserver;
 
 public class Headers {
 

@@ -14,7 +14,7 @@
 * limitations under the License.
 */
 
-package net.orolle.vertigo.fbp.webserver;
+package net.orolle.vertigo.ui.webserver;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

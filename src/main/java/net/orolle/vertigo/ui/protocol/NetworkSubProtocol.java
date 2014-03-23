@@ -1,6 +1,6 @@
-package net.orolle.vertigo.fbp.protocol;
+package net.orolle.vertigo.ui.protocol;
 
-import net.orolle.vertigo.fbp.data.FbpUser;
+import net.orolle.vertigo.ui.data.FbpUser;
 
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
@@ -22,8 +22,19 @@ public class NetworkSubProtocol extends SubProtocolStub {
     handlers().put("start", new Handler<JsonObject>() {
       @Override
       public void handle(JsonObject msg) {
+        System.out.println(msg.encode());
         // response with started msg
-        throw new IllegalStateException("NOT IMPLEMENTED:\n"+msg.encodePrettily()+"\n");
+        final String graph = payload(msg).getString("graph");
+        
+        user.env.vertigo.start(user.graph(graph), new Handler<JsonObject>() {
+          
+          @Override
+          public void handle(JsonObject event) {
+            // started msg
+            user.send(new JsonObject().putString("graph", graph)
+                .putNumber("time", System.currentTimeMillis()));
+          }
+        });
       }
     });
     

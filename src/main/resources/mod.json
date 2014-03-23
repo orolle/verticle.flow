@@ -1,19 +1,20 @@
 {
 
   // Java verticle
-  "main":"net.orolle.vertigo.fbp.Main",
+  "main":"net.orolle.vertigo.ui.Main",
   "preserve-cwd": true,
+  "includes": "net.kuujo~vertigo~0.6.4",
 
   // If your module is going to be registered in the Vert.x module registry you will also need the following
   // mandatory fields
-  "description":"Flow Based Programming Network Protocol for Vertigo",
+  "description":"Vertigo ui based on noflo-ui and an implementation of fbp network protocol",
   "licenses": ["The Apache Software License Version 2.0"],
   "author": "Oliver Rolle",
 
   // Optional fields
   "developers": ["Other Dev 1", "Other Dev 2"],
   "keywords": ["vertigo", "noflo", "fbp"],
-  "homepage": "",
+  "homepage": "https://github.com/orolle/vertigo-ui",
 
   "auto-redeploy": true
 }
