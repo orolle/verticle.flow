@@ -1,7 +1,7 @@
 package net.orolle.vertigo.ui.protocol;
 
-import net.orolle.vertigo.ui.data.FbpVertigo;
 import net.orolle.vertigo.ui.data.FbpUser;
+import net.orolle.vertigo.ui.data.FbpVertigo;
 
 import org.vertx.java.core.Handler;
 import org.vertx.java.core.json.JsonObject;
@@ -11,7 +11,8 @@ import org.vertx.java.core.json.JsonObject;
  * @author Oliver Rolle
  *
  */
-public class ComponentSubProtocol extends SubProtocolStub {
+public class ComponentSubProtocol extends SubProtocolStub<ComponentSubProtocol> {
+  public static final String protocol = "component";
 
   public ComponentSubProtocol(FbpUser f) {
     super(f);
@@ -54,5 +55,16 @@ public class ComponentSubProtocol extends SubProtocolStub {
         .putString("command", "list")
         .putObject("payload", component);
     return user.send(reply);
+  }
+
+  @Override
+  public ComponentSubProtocol send(String cmd, JsonObject payload) {
+    JsonObject msg = new JsonObject()
+    .putString("protocol", protocol)
+    .putString("command", cmd)
+    .putObject("payload", payload);
+    
+    user.send(msg);
+    return this;
   }
 }

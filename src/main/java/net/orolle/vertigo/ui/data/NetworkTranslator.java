@@ -12,7 +12,6 @@ import net.orolle.vertigo.ui.data.jgrapht.JgConnection;
 import net.orolle.vertigo.ui.data.jgrapht.JgGraph;
 
 import org.vertx.java.core.json.JsonObject;
-import org.vertx.java.core.sockjs.impl.JsonCodec;
 
 public class NetworkTranslator {
   private final JgGraph graph;

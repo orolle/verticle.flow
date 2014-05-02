@@ -27,11 +27,11 @@ Add after definition of "Local NoFlo HTML5 environment":
         });
         this.userRuntimes.push(runtime.runtime);
         
-        
 
 NoFlo-UI has a bug in detection & usage of runtimes:
 elements/noflo-runtime.html
 Hack: add noflo-vertigo runtime as option so that type can be set
+> If a project is created, select noflo-vertigo runtime. The first time in the project you have to select the noflo-vertigo runtime again (top-right corner)
 
 IN FUNCTION  updateGraphType: function (graph) { ... }
 
@@ -47,6 +47,49 @@ REPLACE Switch-Case with:
             type = 'noflo-browser';
             break;
         }
-        
 
-If a project is created, select noflo-vertigo runtime. The first time in the project you have to select the noflo-vertigo runtime again (top-right corner)
+
+
+NoFlo-UI does not know, that vertigo backend manages a single project (Local Vertigo) with all graphs. 
+elements/noflo-main.html
+Hack: Add vertigo project in defaults and switch IMMEDIATLY to the vertigo project
+
+IN FUNCTION  preparedefaults: function () { ... }
+
+        // Initalize Vertigo Project
+        var project = {
+          "id": "vertigo-ui",
+          "name": "Vertigo Graphical User Interface",
+          "type": "noflo-vertigo",
+          "graphs": [],
+          "components": [],
+          "main": null,
+          "mainGraph": null 
+        };
+        
+        var noflo = require('noflo');
+        var graph = new noflo.Graph("main");
+        graph.setProperties({
+          id: graph.name.replace(' ', '_'),
+          project: project.id,
+          environment: {
+            type: "noflo-vertigo"
+          }
+        });
+        project.graphs.push(graph);
+        project.main = graph.properties.id;
+        project.mainGraph = graph;
+        
+        this.projects(project); // adds to list
+        this.createdproject(project); // switches to project immediatly
+        
+        
+NoFlo-UI does not speak Backend to Frontend communication. Add these features!
+elements/ConnectRuntime.coffee
+
+At the end of the file protocol added
+
+
+
+IN File components/noflo-noflo-runtime/components/SendGraphChanges.coffee
+is the EventEmitter (UI pubsub) translated to noflo Runtime (FBPNP Websocket "pubsub")

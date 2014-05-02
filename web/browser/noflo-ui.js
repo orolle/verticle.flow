@@ -18672,6 +18672,7 @@ SendGraphChanges = (function(_super) {
     this.addInitial = __bind(this.addInitial, this);
     this.removeEdge = __bind(this.removeEdge, this);
     this.addEdge = __bind(this.addEdge, this);
+    this.changeNode = __bind(this.changeNode, this);
     this.renameNode = __bind(this.renameNode, this);
     this.removeNode = __bind(this.removeNode, this);
     this.addNode = __bind(this.addNode, this);
@@ -18742,6 +18743,7 @@ SendGraphChanges = (function(_super) {
     this.graph.on('removeInport', this.removeInport);
     this.graph.on('addOutport', this.addOutport);
     this.graph.on('removeOutport', this.removeOutport);
+    this.graph.on('changeNode', this.changeNode);
     return this.subscribed = true;
   };
 
@@ -18761,6 +18763,7 @@ SendGraphChanges = (function(_super) {
     this.graph.removeListener('removeInport', this.removeInport);
     this.graph.removeListener('addOutport', this.addOutport);
     this.graph.removeListener('removeOutport', this.removeOutport);
+    this.graph.removeListener('changeNode', this.changeNode);
     this.subscribed = false;
     this.outPorts.sent.disconnect();
     return this.outPorts.queued.disconnect();
@@ -18794,6 +18797,15 @@ SendGraphChanges = (function(_super) {
     return this.registerChange('renamenode', {
       from: from,
       to: to,
+      graph: this.graph.properties.id
+    });
+  };
+
+  SendGraphChanges.prototype.changeNode = function(node) {
+    return this.registerChange('changenode', {
+      id: node.id,
+      component: node.component,
+      metadata: node.metadata,
       graph: this.graph.properties.id
     });
   };
@@ -19467,7 +19479,8 @@ module.exports = JSON.parse('{"name":"noflo-ui","description":"NoFlo Development
 require.register("noflo-ui/components/ConnectRuntime.js", function(exports, require, module){
 var ConnectRuntime, noflo,
   __hasProp = {}.hasOwnProperty,
-  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+  __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+  __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
 noflo = require('noflo');
 
@@ -19791,14 +19804,49 @@ ConnectRuntime = (function(_super) {
         });
       };
     })(this));
-    return runtime.on('icon', function(_arg) {
-      var icon, id;
-      id = _arg.id, icon = _arg.icon;
-      if (!editor.updateIcon) {
-        return;
-      }
-      return editor.updateIcon(id, icon);
-    });
+    runtime.on('icon', (function(_this) {
+      return function(_arg) {
+        var icon, id;
+        id = _arg.id, icon = _arg.icon;
+        if (!editor.updateIcon) {
+          return;
+        }
+        return editor.updateIcon(id, icon);
+      };
+    })(this));
+    return runtime.on('graph', (function(_this) {
+      return function(_arg) {
+        var command, graph, graphId, payload, _ref;
+        command = _arg.command, payload = _arg.payload;
+        if (command === 'clear') {
+          graph = new noflo.Graph(payload.name);
+          graph.setProperties({
+            id: payload.id,
+            project: _this.project.type,
+            environment: {
+              type: payload.library
+            }
+          });
+          if (_ref = graph.properties.id, __indexOf.call(_this.project.graphs.map(function(g) {
+            return g.properties.id;
+          }), _ref) < 0) {
+            _this.project.graphs.push(graph);
+          }
+        }
+        if (command === 'addnode') {
+          graphId = payload.graph;
+          if (editor.graph.properties.id === graphId) {
+            editor.graph.addNode(payload.id, payload.component, payload.metadata);
+          }
+        }
+        if (command === 'addedge') {
+          graphId = payload.graph;
+          if (editor.graph.properties.id === graphId) {
+            return editor.graph.addEdge(payload.src.node, payload.src.port, payload.tgt.node, payload.src.port, payload.metadata);
+          }
+        }
+      };
+    })(this));
   };
 
   return ConnectRuntime;

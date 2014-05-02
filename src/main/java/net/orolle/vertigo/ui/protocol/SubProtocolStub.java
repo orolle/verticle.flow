@@ -15,7 +15,7 @@ import org.vertx.java.core.json.JsonObject;
  * @author Oliver Rolle
  *
  */
-public class SubProtocolStub {
+public abstract class SubProtocolStub<T extends SubProtocolStub> {
   public static final JsonObject EMPTY = new JsonObject();
   
   public final FbpUser user;
@@ -39,4 +39,6 @@ public class SubProtocolStub {
   public JsonObject payload(JsonObject msg){
     return msg.getObject("payload");
   }
+  
+  public abstract T send(String cmd, JsonObject payload);
 }

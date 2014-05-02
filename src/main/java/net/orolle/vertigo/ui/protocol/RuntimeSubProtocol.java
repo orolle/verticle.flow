@@ -10,8 +10,9 @@ import org.vertx.java.core.json.JsonObject;
  * @author Oliver Rolle
  *
  */
-public class RuntimeSubProtocol extends SubProtocolStub {
-
+public class RuntimeSubProtocol extends SubProtocolStub<RuntimeSubProtocol> {
+  public static final String protocol = "runtime";
+  
   public RuntimeSubProtocol(FbpUser con) {
     super(con);
     
@@ -29,6 +30,17 @@ public class RuntimeSubProtocol extends SubProtocolStub {
         throw new IllegalStateException("NOT IMPLEMENTED:\n"+msg.encodePrettily()+"\n");
       }
     });
+  }
+
+  @Override
+  public RuntimeSubProtocol send(String cmd, JsonObject payload) {
+    JsonObject msg = new JsonObject()
+    .putString("protocol", protocol)
+    .putString("command", cmd)
+    .putObject("payload", payload);
+    
+    user.send(msg);
+    return this;
   }
 
 }

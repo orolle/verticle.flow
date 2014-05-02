@@ -1,5 +1,6 @@
 package net.orolle.vertigo.ui;
 
+import net.kuujo.vertigo.java.VertigoVerticle;
 import net.orolle.vertigo.ui.data.FbpEnvironment;
 import net.orolle.vertigo.ui.data.FbpUser;
 import net.orolle.vertigo.ui.data.VertigoInterface;
@@ -17,13 +18,13 @@ import org.vertx.java.core.json.JsonObject;
  * @author Oliver Rolle
  *
  */
-public class Main extends BusModBase {  
+public class Main extends VertigoVerticle {  
 
   @Override
   public void start() {
     super.start();
     
-    final VertigoInterface vertigoRuntime = new VertigoInterface(getVertx(), getContainer());
+    final VertigoInterface vertigoRuntime = new VertigoInterface(getVertx(), getContainer(), vertigo);
     final FbpEnvironment fbpRuntime = new FbpEnvironment(vertigoRuntime);
 
     JsonObject web_config = new JsonObject()

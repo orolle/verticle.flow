@@ -1,7 +1,5 @@
 package net.orolle.vertigo.ui.data;
 
-import net.orolle.vertigo.ui.data.jgrapht.JgComponent;
-
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;
 

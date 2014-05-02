@@ -287,8 +287,9 @@
       preparedefaults: function () {
         // Every NoFlo UI instance should have at least the local IFRAME runtime available
         var hasIframeRuntime = false;
+        
+        // Initialze Runtime
         var runtime = null;
-
         runtime = new this.registry.Runtime({
           label: 'Vertigo runtime',
           id: require('uuid')(),
@@ -307,9 +308,42 @@
           type: 'noflo-browser'
         });
         this.userRuntimes.push(runtime.runtime);
-        
-        
         this.fire('runtimes', this.userRuntimes);
+        
+        // Initalize Vertigo Project
+        var project = {
+          "id": "vertigo-ui",
+          "name": "vertigo-ui",
+          "type": "noflo-vertigo",
+          "graphs": [],
+          "components": [],
+          "main": null,
+          "mainGraph": null 
+        };
+        
+        var noflo = require('noflo');
+        var graph = new noflo.Graph("main");
+        graph.setProperties({
+          id: graph.name.replace(' ', '_'),
+          project: project.id,
+          environment: {
+            type: "noflo-vertigo"
+          }
+        });
+        project.graphs.push(graph);
+        project.main = graph.properties.id;
+        project.mainGraph = graph;
+        
+        var hash = window.location.hash;
+        
+        this.projects(project);
+        this.createdproject(project);
+        
+        if(hash !== ""){
+          setTimeout(function(){
+            window.location.hash = hash;
+          }, 2000);
+        }
       },
       createdproject: function (project) {
         window.location.hash = '#project/' + project.id + '/' + project.main;

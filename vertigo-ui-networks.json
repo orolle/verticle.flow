@@ -1,0 +1,143 @@
+{
+  "aggregate-product-order" : {
+    "id" : "aggregate-product-order",
+    "name" : "1. Aggregate Product Order",
+    "library" : "noflo-vertigo",
+    "main" : false,
+    "components" : [ {
+      "id" : "net.orolle.vertigo.module~vertigo-word-feeder~0.1_nvnsp",
+      "component" : "net.orolle.vertigo.module~vertigo-word-feeder~0.1",
+      "metadata" : {
+        "label" : "net.orolle.vertigo.module~vertigo-word-feeder~0.1",
+        "x" : 360,
+        "y" : 108
+      },
+      "config" : { }
+    }, {
+      "id" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1_tk1mg",
+      "component" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1",
+      "metadata" : {
+        "label" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1",
+        "x" : 828,
+        "y" : 108
+      },
+      "config" : { }
+    }, {
+      "id" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1_wf3nt",
+      "component" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1",
+      "metadata" : {
+        "label" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1",
+        "x" : 828,
+        "y" : 396
+      },
+      "config" : { }
+    }, {
+      "id" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1_fn8np",
+      "component" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1",
+      "metadata" : {
+        "label" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1",
+        "x" : 1296,
+        "y" : 396
+      },
+      "config" : { }
+    } ],
+    "connections" : [ {
+      "src" : {
+        "node" : "net.orolle.vertigo.module~vertigo-word-feeder~0.1_nvnsp",
+        "port" : "default"
+      },
+      "tgt" : {
+        "node" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1_tk1mg",
+        "port" : "default"
+      }
+    }, {
+      "src" : {
+        "node" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1_tk1mg",
+        "port" : "default"
+      },
+      "tgt" : {
+        "node" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1_wf3nt",
+        "port" : "default"
+      }
+    }, {
+      "src" : {
+        "node" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1_wf3nt",
+        "port" : "default"
+      },
+      "tgt" : {
+        "node" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1_fn8np",
+        "port" : "default"
+      }
+    } ]
+  },
+  "MyCoolGraph" : {
+    "id" : "MyCoolGraph",
+    "name" : "MyCoolGraph",
+    "library" : "vertigo-ui",
+    "main" : false,
+    "components" : [ {
+      "id" : "net.orolle.vertigo.module~vertigo-word-feeder~0.1_hsqih",
+      "component" : "net.orolle.vertigo.module~vertigo-word-feeder~0.1",
+      "metadata" : {
+        "label" : "net.orolle.vertigo.module~vertigo-word-feeder~0.1",
+        "x" : 334,
+        "y" : 100
+      },
+      "config" : { }
+    }, {
+      "id" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1_857z2",
+      "component" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1",
+      "metadata" : {
+        "label" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1",
+        "x" : 828,
+        "y" : 108
+      },
+      "config" : { }
+    } ],
+    "connections" : [ {
+      "src" : {
+        "node" : "net.orolle.vertigo.module~vertigo-word-feeder~0.1_hsqih",
+        "port" : "default"
+      },
+      "tgt" : {
+        "node" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1_857z2",
+        "port" : "default"
+      }
+    } ]
+  },
+  "main" : {
+    "id" : "main",
+    "name" : "main",
+    "library" : "vertigo-ui",
+    "main" : true,
+    "components" : [ {
+      "id" : "net.orolle.vertigo.module~vertigo-word-feeder~0.1_zdh4a",
+      "component" : "net.orolle.vertigo.module~vertigo-word-feeder~0.1",
+      "metadata" : {
+        "label" : "net.orolle.vertigo.module~vertigo-word-feeder~0.1",
+        "x" : 648,
+        "y" : 180
+      },
+      "config" : { }
+    }, {
+      "id" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1_58veu",
+      "component" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1",
+      "metadata" : {
+        "label" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1",
+        "x" : 1152,
+        "y" : 180
+      },
+      "config" : { }
+    } ],
+    "connections" : [ {
+      "src" : {
+        "node" : "net.orolle.vertigo.module~vertigo-word-feeder~0.1_zdh4a",
+        "port" : "default"
+      },
+      "tgt" : {
+        "node" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1_58veu",
+        "port" : "default"
+      }
+    } ]
+  }
+}

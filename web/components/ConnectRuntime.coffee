@@ -181,8 +181,28 @@ class ConnectRuntime extends noflo.Component
         group: if payload.group? then payload.group else ''
         data: if payload.data? then payload.data else ''
         subgraph: if payload.subgraph? then payload.subgraph else ''
-    runtime.on 'icon', ({id, icon}) ->
+    runtime.on 'icon', ({id, icon}) =>
       return unless editor.updateIcon
       editor.updateIcon id, icon
-
+    # Add functionality
+    runtime.on 'graph', ({command, payload}) =>
+      if command == 'clear'
+        graph = new noflo.Graph payload.name
+        graph.setProperties(
+          id: payload.id
+          project: @project.type
+          environment:
+            type: payload.library
+        )
+        if graph.properties.id not in (@project.graphs.map (g) -> g.properties.id)
+          @project.graphs.push graph
+      if command == 'addnode'
+        graphId = payload.graph
+        if editor.graph.properties.id == graphId
+          editor.graph.addNode(payload.id, payload.component, payload.metadata)
+      if command == 'addedge'
+        graphId = payload.graph
+        if editor.graph.properties.id == graphId
+          editor.graph.addEdge(payload.src.node, payload.src.port, payload.tgt.node, payload.src.port, payload.metadata)
+      
 exports.getComponent = -> new ConnectRuntime

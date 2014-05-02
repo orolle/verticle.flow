@@ -8,13 +8,16 @@ import org.vertx.java.core.json.JsonObject;
 public class JgComponent {
 
   private final JsonObject obj;
-  
-  private JsonElement config = new JsonObject();
-  private int      instances = 1;
 
   public JgComponent(JsonObject obj) {
     super();
     this.obj = obj;
+    
+    if(!obj.containsField("config"))
+      obj.putElement("config", new JsonObject());
+    
+    if(!obj.containsField("config"))
+      obj.putNumber("instances", 1);
   }
 
   public String id(){
@@ -26,26 +29,40 @@ public class JgComponent {
   }
 
   public JsonElement config(){
-    return config;
+    return obj.getElement("config", new JsonObject());
   }
 
   public JgComponent config(JsonElement config){
-    this.config = config;
+    obj.putElement("config", config);
+    return this;
+  }
+  
+  public JsonObject metadata(){
+    return obj.getObject("metadata");
+  }
+
+  public JgComponent metadata(JsonObject metadata){
+    obj.putObject("metadata", metadata);
     return this;
   }
   
   public int instances(){
-    return instances;
+    return obj.getInteger("instances", 1);
   }
 
   public JgComponent instances(int instances){
-    this.instances = instances;
+    obj.putNumber("instances", instances);
     return this;
   }
+  
+  public JsonObject toJson(){
+    return this.obj.copy();
+  }
+
 
   @Override
   public int hashCode() {
-    return obj.getString("id").hashCode();
+    return id().hashCode();
   }
 
   public boolean isFeeder(){

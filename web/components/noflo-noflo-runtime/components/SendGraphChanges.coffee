@@ -49,6 +49,7 @@ class SendGraphChanges extends noflo.Component
     @graph.on 'removeInport', @removeInport
     @graph.on 'addOutport', @addOutport
     @graph.on 'removeOutport', @removeOutport
+    @graph.on 'changeNode', @changeNode # add Feature
     @subscribed = true
 
   unsubscribe: ->
@@ -65,6 +66,7 @@ class SendGraphChanges extends noflo.Component
     @graph.removeListener 'removeInport', @removeInport
     @graph.removeListener 'addOutport', @addOutport
     @graph.removeListener 'removeOutport', @removeOutport
+    @graph.removeListener 'changeNode', @changeNode # add Feature
     @subscribed = false
 
     @outPorts.sent.disconnect()
@@ -92,6 +94,13 @@ class SendGraphChanges extends noflo.Component
     @registerChange 'renamenode',
       from: from
       to: to
+      graph: @graph.properties.id
+      
+  changeNode: (node) =>
+    @registerChange 'changenode',
+      id: node.id
+      component: node.component
+      metadata: node.metadata
       graph: @graph.properties.id
 
   addEdge: (edge) =>

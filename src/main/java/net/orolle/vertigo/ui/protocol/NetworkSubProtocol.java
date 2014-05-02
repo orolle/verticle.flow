@@ -10,7 +10,8 @@ import org.vertx.java.core.json.JsonObject;
  * @author Oliver Rolle
  *
  */
-public class NetworkSubProtocol extends SubProtocolStub {
+public class NetworkSubProtocol extends SubProtocolStub<NetworkSubProtocol> {
+  public static final String protocol = "network";
 
   public NetworkSubProtocol(FbpUser con) {
     super(con);
@@ -26,13 +27,18 @@ public class NetworkSubProtocol extends SubProtocolStub {
         // response with started msg
         final String graph = payload(msg).getString("graph");
         
-        user.env.vertigo.start(user.graph(graph), new Handler<JsonObject>() {
-          
+        user.env.depolyment(user.env.graph(graph)).deploy(new Handler<JsonObject>() {
+          // started
           @Override
           public void handle(JsonObject event) {
-            // started msg
-            user.send(new JsonObject().putString("graph", graph)
+            send("started", new JsonObject().putString("graph", graph)
                 .putNumber("time", System.currentTimeMillis()));
+          }
+        }, new Handler<JsonObject>() {
+          // excpetion
+          @Override
+          public void handle(JsonObject event) {
+            
           }
         });
       }
@@ -50,16 +56,31 @@ public class NetworkSubProtocol extends SubProtocolStub {
     handlers().put("stop", new Handler<JsonObject>() {
       @Override
       public void handle(JsonObject msg) {
-        // response with stopped msg
+        final String graph = payload(msg).getString("graph");
         
-        throw new IllegalStateException("NOT IMPLEMENTED:\n"+msg.encodePrettily()+"\n");
+        if(user.env.depolyment(user.env.graph(graph)) != null){
+          user.env.depolyment(user.env.graph(graph)).remove(new Handler<JsonObject>() {
+            // stopped
+            @Override
+            public void handle(JsonObject data) {
+              send("stopped", new JsonObject().putString("graph", graph)
+                  .putNumber("time", data.getNumber("time"))
+                  .putNumber("uptime", data.getNumber("uptime")));
+            }
+          },new Handler<JsonObject>() {
+            @Override
+            public void handle(JsonObject event) {
+              // TODO Auto-generated method stub
+              
+            }});
+        }
       }
     });
     
     handlers().put("edges", new Handler<JsonObject>() {
       @Override
       public void handle(JsonObject msg) {
-        throw new IllegalStateException("NOT IMPLEMENTED:\n"+msg.encodePrettily()+"\n");
+        //throw new IllegalStateException("NOT IMPLEMENTED:\n"+msg.encodePrettily()+"\n");
       }
     });
     
@@ -123,6 +144,17 @@ public class NetworkSubProtocol extends SubProtocolStub {
       }
     });
     */
+  }
+
+  @Override
+  public NetworkSubProtocol send(String cmd, JsonObject payload) {
+    JsonObject msg = new JsonObject()
+    .putString("protocol", protocol)
+    .putString("command", cmd)
+    .putObject("payload", payload);
+    
+    user.send(msg);
+    return this;
   }
 
 }

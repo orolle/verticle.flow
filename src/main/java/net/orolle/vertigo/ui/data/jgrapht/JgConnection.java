@@ -1,6 +1,7 @@
 package net.orolle.vertigo.ui.data.jgrapht;
 
 import org.jgrapht.graph.DefaultEdge;
+import org.vertx.java.core.json.JsonObject;
 
 public class JgConnection extends DefaultEdge {
   private static final long serialVersionUID = -2368004628697798986L;
@@ -29,6 +30,12 @@ public class JgConnection extends DefaultEdge {
 
   public String getV2Port() {
     return in;
+  }
+  
+  public JsonObject toJson(){
+    return new JsonObject().putObject("src", new JsonObject().putString("node", v1.id()).putString("port", out))
+        .putObject("tgt", new JsonObject().putString("node", v2.id()).putString("port", in));
+    
   }
 
   public String toString() {
