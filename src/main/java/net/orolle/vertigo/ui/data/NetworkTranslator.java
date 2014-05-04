@@ -101,12 +101,11 @@ public class NetworkTranslator {
 
       if(comp.isFeeder()){
         c = (Component<?>) network.addFeeder(comp.id(), comp.component(), config, instances);
-      }else if(comp.isWorker()){
-        c = (Component<?>) network.addWorker(comp.id(), comp.component(), config, instances);
       }else if(comp.isGrouping()) {
         // Grouping is not a Component, but handled here
       }else{
-        throw new IllegalStateException(comp.toString()+" is not a worker, feeder, grouping, data");
+        // default behavior is that component worker
+        c = (Component<?>) network.addWorker(comp.id(), comp.component(), config, instances);
       }
 
 

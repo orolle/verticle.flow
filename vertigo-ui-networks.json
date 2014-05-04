@@ -128,6 +128,15 @@
         "y" : 180
       },
       "config" : { }
+    }, {
+      "id" : "net.orolle.vertigo.ui~vertigo-ui-out~0.1_ycd6b",
+      "component" : "net.orolle.vertigo.ui~vertigo-ui-out~0.1",
+      "metadata" : {
+        "label" : "net.orolle.vertigo.ui~vertigo-ui-out~0.1",
+        "x" : 1584,
+        "y" : 180
+      },
+      "config" : { }
     } ],
     "connections" : [ {
       "src" : {
@@ -136,6 +145,15 @@
       },
       "tgt" : {
         "node" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1_58veu",
+        "port" : "default"
+      }
+    }, {
+      "src" : {
+        "node" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1_58veu",
+        "port" : "default"
+      },
+      "tgt" : {
+        "node" : "net.orolle.vertigo.ui~vertigo-ui-out~0.1_ycd6b",
         "port" : "default"
       }
     } ]

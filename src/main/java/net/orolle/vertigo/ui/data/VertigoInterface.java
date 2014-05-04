@@ -50,6 +50,8 @@ public class VertigoInterface {
     }
 
     public void deploy(final Handler<JsonObject> startedHandler, final Handler<JsonObject> exceptionHandler) {
+      System.out.println(this.network.encodePrettily());
+      
       Network network = Network.fromJson(this.network);
       vertigo.deployLocalNetwork(network, new Handler<AsyncResult<NetworkContext>>() {
         @Override

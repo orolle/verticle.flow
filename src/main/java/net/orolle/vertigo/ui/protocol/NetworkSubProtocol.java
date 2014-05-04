@@ -3,6 +3,7 @@ package net.orolle.vertigo.ui.protocol;
 import net.orolle.vertigo.ui.data.FbpUser;
 
 import org.vertx.java.core.Handler;
+import org.vertx.java.core.eventbus.Message;
 import org.vertx.java.core.json.JsonObject;
 
 /**
@@ -12,10 +13,20 @@ import org.vertx.java.core.json.JsonObject;
  */
 public class NetworkSubProtocol extends SubProtocolStub<NetworkSubProtocol> {
   public static final String protocol = "network";
+  /**
+   * From net.orolle.vertigo.ui~vertigo-ui-out~x.y
+   */
+  public static final String uiOutAddress = "net.orolle.vertigo.ui.vertigo-ui-out";
 
   public NetworkSubProtocol(FbpUser con) {
     super(con);
-    
+
+    user.env.vertx.eventBus().registerHandler(uiOutAddress, new Handler<Message<JsonObject>>() {
+      @Override
+      public void handle(Message<JsonObject> msg) {
+        send("output", new JsonObject().putString("message", msg.body().encodePrettily()));
+      }
+    });
     
     /*
      * Network
