@@ -6,14 +6,14 @@
 
   // If your module is going to be registered in the Vert.x module registry you will also need the following
   // mandatory fields
-  "description":"",
-  "licenses": ["The Apache Software License Version 2.0", ],
+  "description":"A web-based user interface for vertigo based on Node-Red.",
+  "licenses": ["The Apache Software License Version 2.0"],
   "author": "Oliver Rolle",
 
   // Optional fields
   "developers": ["Other Dev 1", "Other Dev 2"],
-  "keywords": ["vertigo", "noflo", "fbp"],
-  "homepage": "https://github.com/orolle/vertigo-ui",
+  "keywords": ["vertigo", "node-red", "visual programming", "front end", "flow based programming"],
+  "homepage": "https://github.com/orolle/verticle.flow",
 
   "auto-redeploy": true
 }
