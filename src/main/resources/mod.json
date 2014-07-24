@@ -3,7 +3,7 @@
   // Java verticle
   "main":"net.orolle.vertigo.ui.Main",
   "preserve-cwd": true,
-  "includes": "net.kuujo~vertigo~0.6.4",
+  //"includes": "net.kuujo~vertigo~0.7.0-RC2",
 
   // If your module is going to be registered in the Vert.x module registry you will also need the following
   // mandatory fields

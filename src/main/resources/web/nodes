@@ -1,0 +1,19 @@
+<script type="text/x-red" data-template-name="component">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="type a verb">
+    </div>
+    <div class="form-row">
+        <label for="node-input-config"><i class="icon-wrench"></i>Config</label>
+        <input type="hidden" id="node-input-config" autofocus="autofocus">
+        <div style="height: 250px;" class="node-text-editor" id="node-input-config-editor" ></div>
+    </div>
+    <div class="form-row">
+        <label for="node-input-instances"><i class="icon-random"></i>Instances</label>
+        <input id="node-input-instances" style="width: 60px; height: 1.7em;" value="1">
+    </div>
+    <div class="form-tips">See the Info tab for further component descriptions.</div>
+</script><script type="text/x-red" data-help-name="component">
+        <p>A component.</p>
+        <p>some text ...<code>this is code</code>.</p>
+</script><script type="text/javascript">RED.nodes.registerType("component",{color:"#fdd0a2",category:"function",defaults:{name:{value:""},config:{value:"{\n  \n}"},instances:{value:1}},inputs:1,outputs:1,icon:"function.png",label:function(){return this.name},oneditprepare:function(){function n(n,e){$("#node-input-config-editor").css("height",e.size.height-275+"px")}$("#node-input-instances").spinner({min:1}),$("#dialog").on("dialogresize",n),$("#dialog").one("dialogopen",function(){var e=$("#dialog").dialog("option","sizeCache-function");e&&n(null,{size:e})}),$("#dialog").one("dialogclose",function(){$("#dialog").dialog("option","height");$("#dialog").off("dialogresize",n)});var e=this;require(["orion/editor/edit"],function(n){e.editor=n({parent:document.getElementById("node-input-config-editor"),lang:"js",contents:$("#node-input-config").val()}),RED.library.create({url:"functions",type:"function",editor:e.editor,fields:["name","outputs"]}),$("#node-input-name").focus()})},oneditsave:function(){$("#node-input-config").val(this.editor.getText()),delete this.editor}});</script> 
