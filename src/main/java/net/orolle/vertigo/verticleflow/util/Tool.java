@@ -1,4 +1,4 @@
-package net.orolle.vertigo.ui.util;
+package net.orolle.vertigo.verticleflow.util;
 
 import java.util.List;
 

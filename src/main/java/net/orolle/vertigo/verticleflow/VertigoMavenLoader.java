@@ -1,4 +1,4 @@
-package net.orolle.vertigo.ui;
+package net.orolle.vertigo.verticleflow;
 
 import java.io.File;
 import java.io.FileInputStream;

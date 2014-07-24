@@ -1,4 +1,4 @@
-package net.orolle.vertigo.ui;
+package net.orolle.vertigo.verticleflow;
 
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;

@@ -1,4 +1,4 @@
-package net.orolle.vertigo.ui.translate;
+package net.orolle.vertigo.verticleflow.translate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,7 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import net.orolle.vertigo.ui.VertigoComponent;
+import net.orolle.vertigo.verticleflow.VertigoComponent;
 
 import org.vertx.java.core.json.JsonArray;
 import org.vertx.java.core.json.JsonObject;

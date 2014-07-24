@@ -1,4 +1,4 @@
-package net.orolle.vertigo.ui.translate;
+package net.orolle.vertigo.verticleflow.translate;
 
 import java.util.ArrayList;
 import java.util.HashMap;
