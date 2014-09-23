@@ -1,0 +1,47 @@
+[ {
+  "type" : "tab",
+  "id" : "c2c09d3a.3202e",
+  "label" : "Sheet 1"
+}, {
+  "id" : "36565e9b.2296fa",
+  "type" : "net.orolle.vertigo.module~vertigo-word-feeder~0.1",
+  "name" : "net.orolle.vertigo.module~vertigo-word-feeder~0.1",
+  "config" : "{\n  \n}",
+  "instances" : "1",
+  "x" : 224.2833251953125,
+  "y" : 143.2833251953125,
+  "z" : "c2c09d3a.3202e",
+  "wires" : {
+    "word" : [ {
+      "node" : "19b9d0f8.833737",
+      "port" : "in"
+    } ]
+  }
+}, {
+  "id" : "e5893332.787508",
+  "type" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1",
+  "name" : "net.orolle.vertigo.module~vertigo-word-count-worker~0.1",
+  "config" : "{\n  \n}",
+  "instances" : "1",
+  "x" : 543.2833251953125,
+  "y" : 304.2833251953125,
+  "z" : "c2c09d3a.3202e",
+  "wires" : {
+    "count" : [ ]
+  }
+}, {
+  "id" : "19b9d0f8.833737",
+  "type" : "fair",
+  "name" : "fair",
+  "config" : "{\n  \n}",
+  "instances" : "1",
+  "x" : 546.2833404541016,
+  "y" : 145.28334045410156,
+  "z" : "c2c09d3a.3202e",
+  "wires" : {
+    "out" : [ {
+      "node" : "e5893332.787508",
+      "port" : "word"
+    } ]
+  }
+} ]
